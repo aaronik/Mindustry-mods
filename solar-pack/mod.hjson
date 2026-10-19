@@ -1,0 +1,8 @@
+name: solar-pack
+displayName: Solar-pack
+author: Aaron
+main: solarpack.SolarPackMod
+description: Drag a rectangle to queue large solar panels and small battery infill.
+version: 0.1.0
+minGameVersion: 160.7
+hidden: true

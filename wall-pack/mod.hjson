@@ -1,0 +1,8 @@
+name: wall-pack
+displayName: Wall-pack
+author: Aaron
+main: wallpack.WallPackMod
+description: Drag a rectangle to queue large walls with small-wall infill.
+version: 0.1.0
+minGameVersion: 160.7
+hidden: true
