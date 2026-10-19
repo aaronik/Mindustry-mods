@@ -101,7 +101,6 @@ public class WallPackMod extends Mod{
             toast("Unlock both sizes of " + smallWall.localizedName + " first."); return;
         }
         armed = true;
-        toast("Wall-pack: drag a rectangle for " + smallWall.localizedName + ".");
     }
     /** Use whichever wall size is selected, or copper if none is selected. */
     private Block[] wallPair(Block selected){

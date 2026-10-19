@@ -72,7 +72,6 @@ public class AutoDrillMod extends Mod{
                 "Selected drill is not unlocked or placeable."); return;
         }
         armed = true;
-        toast("Auto-drill: click an ore patch for " + drill.localizedName + ".");
     }
 
     private boolean ready(){

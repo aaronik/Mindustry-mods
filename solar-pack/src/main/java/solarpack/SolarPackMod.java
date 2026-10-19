@@ -104,7 +104,6 @@ public class SolarPackMod extends Mod{
             toast("Unlock large solar panels and small batteries first.");return;
         }
         armed = true;
-        toast("Solar-pack: drag a rectangle over the map.");
     }
     private boolean ready(){
         return Vars.state != null && Vars.state.isGame() && Vars.player != null &&

@@ -11,7 +11,7 @@ The JAR is `dist/auto-drill-routers.jar`. Copy it into your active Mindustry `mo
 ## Use
 
 1. Select an unlocked drill in the construction menu. If no drill is selected, the tool uses the pneumatic drill (which must be unlocked).
-2. Click **Auto-drill** at the bottom of the screen, just left of the build menu. The button highlights, and a toast tells you the chosen drill.
+2. Click **Auto-drill** at the bottom of the screen, just left of the build menu. The button highlights while armed.
 3. Click an ore tile. The mod queues drills and a connected router border around the drills, including lanes for interior drills. Add your own conveyors along any reachable outer edge.
 4. Click **Auto-drill** again before clicking ore to cancel. There is no keyboard shortcut.
 
