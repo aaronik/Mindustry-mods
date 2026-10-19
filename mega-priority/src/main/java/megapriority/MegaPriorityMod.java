@@ -1,6 +1,12 @@
 package megapriority;
 
 import arc.Events;
+import arc.Core;
+import arc.scene.Element;
+import arc.scene.Group;
+import arc.scene.ui.ImageButton;
+import arc.struct.ObjectSet;
+import mindustry.gen.Icon;
 import arc.struct.IntSeq;
 import arc.struct.IntSet;
 import arc.struct.IntMap;
@@ -28,6 +34,8 @@ public class MegaPriorityMod extends Mod{
     private final IntSet managed = new IntSet();
     private final IntMap<Priority.Mode> lastRequested = new IntMap<>();
     private final IntMap<Long> requestTime = new IntMap<>();
+    private final ObjectSet<ImageButton> hookedCommandButtons = new ObjectSet<>();
+    private long lastManualOverride;
     private boolean hudInstalled;
     private long lastPoll, lowerSince;
     private Priority.Mode lastDesired;
@@ -35,6 +43,7 @@ public class MegaPriorityMod extends Mod{
     public MegaPriorityMod(){
         Events.on(WorldLoadEvent.class, event -> {
             managed.clear(); lastRequested.clear(); requestTime.clear(); lastDesired = null;
+            hookedCommandButtons.clear();
         });
         Events.on(ClientLoadEvent.class, event -> {
             if(hudInstalled) return;
@@ -56,6 +65,7 @@ public class MegaPriorityMod extends Mod{
             });
         });
         Events.run(Trigger.update, this::update);
+        Events.run(Trigger.unitCommandChange, this::hookVanillaCommandButtons);
     }
 
     private boolean ready(){
@@ -101,9 +111,67 @@ public class MegaPriorityMod extends Mod{
         if(!ready()){
             managed.clear(); lastRequested.clear(); requestTime.clear(); lastDesired = null; return;
         }
+        if(Vars.control.input.commandMode && managed.size > 0){
+            hookVanillaCommandButtons();
+            watchVanillaCommandKeys();
+        }
         if(Time.timeSinceMillis(lastPoll) < pollMillis) return;
         poll(false);
     }
+    /** Vanilla command buttons do not emit a user-command event. Attach
+     * click listeners to the command icons rather than guessing from mode
+     * changes, which could be delayed replies to this mod's own requests. */
+    private void hookVanillaCommandButtons(){
+        if(!ready() || !Vars.control.input.commandMode || managed.size == 0) return;
+        var hooked = hookedCommandButtons.iterator();
+        while(hooked.hasNext()) if(!hooked.next().hasParent()) hooked.remove();
+        for(Element element : Vars.ui.hudGroup.getChildren()) hookChildren(element);
+    }
+    private void hookChildren(Element element){
+        if(element instanceof ImageButton button && button.getStyle().imageUp != null &&
+            button.getStyle().up == Styles.clearNoneTogglei.up){
+            for(UnitCommand command : commandChoices()){
+                if(button.getStyle().imageUp == Icon.icons.get(command.icon, Icon.cancel)){
+                    if(hookedCommandButtons.add(button)){
+                        button.clicked(() -> disableSelectedManaged("vanilla command selected"));
+                    }
+                    break;
+                }
+            }
+        }
+        if(element instanceof Group group) for(Element child : group.getChildren()) hookChildren(child);
+    }
+    private static UnitCommand[] commandChoices(){
+        return new UnitCommand[]{UnitCommand.moveCommand, UnitCommand.repairCommand,
+            UnitCommand.rebuildCommand, UnitCommand.assistCommand, UnitCommand.mineCommand,
+            UnitCommand.enterPayloadCommand, UnitCommand.loadUnitsCommand,
+            UnitCommand.loadBlocksCommand, UnitCommand.unloadPayloadCommand,
+            UnitCommand.loopPayloadCommand};
+    }
+    private void watchVanillaCommandKeys(){
+        for(UnitCommand command : commandChoices()){
+            if(command.keybind != null && Core.input.keyTap(command.keybind)){
+                disableSelectedManaged("vanilla command selected");
+                return;
+            }
+        }
+    }
+    private void disableSelectedManaged(String reason){
+        if(Time.timeSinceMillis(lastManualOverride) < 150L) return;
+        lastManualOverride = Time.millis();
+        IntSeq selected = selectedMegas();
+        int removed = 0;
+        for(int i = 0; i < selected.size; i++){
+            int id = selected.get(i);
+            if(managed.remove(id)){
+                lastRequested.remove(id);
+                requestTime.remove(id);
+                removed++;
+            }
+        }
+        if(removed > 0) toast("Mega priority off for " + removed + " Mega(s): " + reason + ".");
+    }
+
     private void poll(boolean immediate){
         long now = Time.millis();
         lastPoll = now;

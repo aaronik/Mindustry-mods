@@ -11,7 +11,7 @@ Four independent **desktop Mindustry** mods: three construction planners and a M
 
 ## Install (no compilation needed)
 
-1. Download Auto Drill Routers, Solar-pack, and Wall-pack from the [latest stable release](https://github.com/Aaronik/Mindustry-mods/releases/latest). Mega Priority is an [experimental prerelease](https://github.com/Aaronik/Mindustry-mods/releases/tag/mega-priority-v0.1.2). **Download individual JAR assets**, not the GitHub “Source code” ZIP.
+1. Download Auto Drill Routers, Solar-pack, and Wall-pack from the [latest stable release](https://github.com/Aaronik/Mindustry-mods/releases/latest). Mega Priority is an [experimental prerelease](https://github.com/Aaronik/Mindustry-mods/releases/tag/mega-priority-v0.1.3). **Download individual JAR assets**, not the GitHub “Source code” ZIP.
 2. In Mindustry, open **Mods → Import Mod → Import File** and choose each JAR. Alternatively, copy each JAR into your active Mindustry `mods` folder. On the Steam macOS installation used to develop these mods, it is:
 
    ```text
