@@ -44,12 +44,13 @@ public class MegaPriorityMod extends Mod{
                 hud.bottom().right();
                 hud.visible(() -> ready() && Vars.ui.hudfrag.shown());
                 hud.table(t -> {
-                    var button = t.button("Mega priority", Styles.togglet, this::toggleSelection)
+                    var button = t.button("Mega priority", Styles.togglet, null)
                         .size(155f,45f)
                         .tooltip("Select Megas, then toggle automatic Rebuild > Repair > Mine.").get();
                     // Checked-state updates are visual only. The default Cell.checked()
                     // fires ChangeEvents, which would call toggleSelection again.
                     button.setProgrammaticChangeEvents(false);
+                    button.clicked(this::toggleSelection);
                     button.update(() -> button.setChecked(selectedAllManaged()));
                 }).padRight(316f).padBottom(159f);
             });
@@ -124,12 +125,20 @@ public class MegaPriorityMod extends Mod{
             UnitCommand currentCommand = ai.currentCommand();
             Priority.Mode current = mode(currentCommand);
             Priority.Mode requested = lastRequested.get(id);
-            // Give server commands time to arrive before treating a mismatch
-            // as a manual change. If the request never lands, stop retrying.
+            // Do not silently opt out when a server command is delayed,
+            // superseded, or reset. Wait briefly, then re-evaluate the actual
+            // command and resend the desired vanilla mode if necessary.
             if(requested != null && current != requested && !immediate &&
                 now - requestTime.get(id, 0L) < 3000L) continue;
-            if(current == null || requested != null && current != requested && !immediate){
-                invalid.add(id); continue;
+            if(current != requested && requested != null){
+                lastRequested.remove(id);
+                requestTime.remove(id);
+            }
+            if(current == null){
+                if(desired == Priority.Mode.rebuild) toRebuild.add(id);
+                else if(desired == Priority.Mode.repair) toRepair.add(id);
+                else toMine.add(id);
+                continue;
             }
             Priority.Mode next = Priority.choose(current,desired,unit.buildPlan() != null,stable);
             if(next == current) continue;
