@@ -121,6 +121,13 @@ public class PlannerTest{
             Planner.Layout result=Planner.plan(randomGrid,4,4,2,0,1024);
             verify(randomGrid,result,2,0);
         }
+        // Boulders/snow props are alwaysReplace; actual structures and
+        // existing construction sites are never overwritten.
+        check(AutoDrillMod.mayPlaceOver(true,false,false),"air is buildable");
+        check(AutoDrillMod.mayPlaceOver(false,true,false),"replaceable terrain is buildable");
+        check(!AutoDrillMod.mayPlaceOver(false,false,false),"unreplaceable terrain blocks planning");
+        check(!AutoDrillMod.mayPlaceOver(false,true,true),"even replaceable block with a building stays blocked");
+        check(!AutoDrillMod.mayPlaceOver(true,false,true),"air tile with building stays blocked");
         System.out.println("Connected-network planner tests passed");
     }
 }

@@ -83,6 +83,12 @@ public class AutoDrillMod extends Mod{
     private void toast(String text){
         if(Vars.ui != null && Vars.ui.hudfrag != null) Vars.ui.hudfrag.showToast(text);
     }
+    static boolean replaceableTerrain(Tile tile){
+        return tile != null && mayPlaceOver(tile.block() == Blocks.air, tile.block().alwaysReplace, tile.build != null);
+    }
+    static boolean mayPlaceOver(boolean air, boolean alwaysReplace, boolean hasBuilding){
+        return !hasBuilding && (air || alwaysReplace);
+    }
     private void queueAt(int x, int y){
         Tile origin = Vars.world.tile(x, y);
         if(origin == null || origin.drop() == null){toast("Click a mineral tile."); return;}
@@ -109,7 +115,7 @@ public class AutoDrillMod extends Mod{
             public boolean mineable(int tx, int ty){return drill.canMine(Vars.world.tile(tx, ty));}
             public boolean free(int tx, int ty){
                 Tile t = Vars.world.tile(tx, ty);
-                return t != null && t.block() == Blocks.air && t.build == null && !reserved.contains(new Planner.Point(tx, ty));
+                return replaceableTerrain(t) && !reserved.contains(new Planner.Point(tx, ty));
             }
             public boolean validDrill(int tx, int ty){return Build.validPlace(drill, Vars.player.team(), tx, ty, 0);}
             public boolean validRouter(int tx, int ty){return Build.validPlace(router, Vars.player.team(), tx, ty, 0);}
