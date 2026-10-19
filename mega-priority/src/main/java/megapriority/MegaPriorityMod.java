@@ -43,10 +43,15 @@ public class MegaPriorityMod extends Mod{
                 hud.touchable = arc.scene.event.Touchable.childrenOnly;
                 hud.bottom().right();
                 hud.visible(() -> ready() && Vars.ui.hudfrag.shown());
-                hud.table(t -> t.button("Mega priority", Styles.togglet, this::toggleSelection)
-                    .checked(b -> selectedAllManaged()).size(155f,45f)
-                    .tooltip("Select Megas, then toggle automatic Rebuild > Repair > Mine."))
-                    .padRight(316f).padBottom(159f);
+                hud.table(t -> {
+                    var button = t.button("Mega priority", Styles.togglet, this::toggleSelection)
+                        .size(155f,45f)
+                        .tooltip("Select Megas, then toggle automatic Rebuild > Repair > Mine.").get();
+                    // Checked-state updates are visual only. The default Cell.checked()
+                    // fires ChangeEvents, which would call toggleSelection again.
+                    button.setProgrammaticChangeEvents(false);
+                    button.update(() -> button.setChecked(selectedAllManaged()));
+                }).padRight(316f).padBottom(159f);
             });
         });
         Events.run(Trigger.update, this::update);
@@ -81,8 +86,12 @@ public class MegaPriorityMod extends Mod{
             if(disable){managed.remove(id); lastRequested.remove(id); requestTime.remove(id);}
             else{managed.add(id); lastRequested.remove(id); requestTime.remove(id);}
         }
-        toast((disable ? "Disabled" : "Enabled") + " priority mode for " + selected.size + " Mega(s).");
-        if(!disable) poll(true);
+        if(disable){
+            toast("Mega priority disabled for " + selected.size + " Mega(s).");
+        }else{
+            poll(true);
+            toast("Mega priority enabled for " + selected.size + " Mega(s); target: " + lastDesired + ".");
+        }
     }
     private void toast(String text){
         if(Vars.ui != null && Vars.ui.hudfrag != null) Vars.ui.hudfrag.showToast(text);
