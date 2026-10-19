@@ -115,6 +115,9 @@ public class SolarPackMod extends Mod{
     private void toast(String message){
         if(Vars.ui != null && Vars.ui.hudfrag != null) Vars.ui.hudfrag.showToast(message);
     }
+    static boolean mayPlaceOver(boolean air,boolean alwaysReplace,boolean hasBuilding){
+        return !hasBuilding && (air || alwaysReplace);
+    }
     private void queueArea(int left,int bottom,int right,int top){
         if(right-left+1 > maxSide || top-bottom+1 > maxSide ||
             (long)(right-left+1)*(top-bottom+1) > maxArea){
@@ -130,7 +133,8 @@ public class SolarPackMod extends Mod{
         SolarPlanner.Grid grid=new SolarPlanner.Grid(){
             public boolean free(int x,int y){
                 Tile t=Vars.world.tile(x,y);
-                return t!=null && t.block()==Blocks.air && t.build==null && !reserved.contains(new SolarPlanner.Point(x,y));
+                return t!=null && mayPlaceOver(t.block()==Blocks.air,t.block().alwaysReplace,t.build!=null) &&
+                    !reserved.contains(new SolarPlanner.Point(x,y));
             }
             public boolean validPanel(int x,int y){return Build.validPlace(panel,Vars.player.team(),x,y,0);}
             public boolean validBattery(int x,int y){return Build.validPlace(battery,Vars.player.team(),x,y,0);}

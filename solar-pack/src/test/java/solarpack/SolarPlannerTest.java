@@ -40,6 +40,11 @@ public class SolarPlannerTest{
         var wide=SolarPlanner.plan(new Grid(),0,0,199,199,3,-1);
         check(wide.panels().size()==4356 && wide.batteries().size()==796,
             "200x200 should pack 4356 panels and 796 batteries: " + wide);
+        check(SolarPackMod.mayPlaceOver(true,false,false),"empty tile is buildable");
+        check(SolarPackMod.mayPlaceOver(false,true,false),"removable terrain must be buildable");
+        check(!SolarPackMod.mayPlaceOver(false,false,false),"unreplaceable terrain must remain blocked");
+        check(!SolarPackMod.mayPlaceOver(false,true,true),"real building on prop remains blocked");
+        check(!SolarPackMod.mayPlaceOver(true,false,true),"real building on empty tile remains blocked");
         System.out.println("Solar-pack layout tests passed");
     }
 }
