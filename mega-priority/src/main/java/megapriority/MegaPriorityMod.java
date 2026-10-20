@@ -97,9 +97,7 @@ public class MegaPriorityMod extends Mod{
             if(disable){managed.remove(id); lastRequested.remove(id); requestTime.remove(id);}
             else{managed.add(id); lastRequested.remove(id); requestTime.remove(id);}
         }
-        if(disable){
-            toast("Mega priority disabled for " + selected.size + " Mega(s).");
-        }else{
+        if(!disable){
             poll(true);
             toast("Mega priority enabled for " + selected.size + " Mega(s); target: " + lastDesired + ".");
         }
@@ -133,7 +131,7 @@ public class MegaPriorityMod extends Mod{
             for(UnitCommand command : commandChoices()){
                 if(button.getStyle().imageUp == Icon.icons.get(command.icon, Icon.cancel)){
                     if(hookedCommandButtons.add(button)){
-                        button.clicked(() -> disableSelectedManaged("vanilla command selected"));
+                        button.clicked(this::disableSelectedManaged);
                     }
                     break;
                 }
@@ -151,25 +149,22 @@ public class MegaPriorityMod extends Mod{
     private void watchVanillaCommandKeys(){
         for(UnitCommand command : commandChoices()){
             if(command.keybind != null && Core.input.keyTap(command.keybind)){
-                disableSelectedManaged("vanilla command selected");
+                disableSelectedManaged();
                 return;
             }
         }
     }
-    private void disableSelectedManaged(String reason){
+    private void disableSelectedManaged(){
         if(Time.timeSinceMillis(lastManualOverride) < 150L) return;
         lastManualOverride = Time.millis();
         IntSeq selected = selectedMegas();
-        int removed = 0;
         for(int i = 0; i < selected.size; i++){
             int id = selected.get(i);
             if(managed.remove(id)){
                 lastRequested.remove(id);
                 requestTime.remove(id);
-                removed++;
             }
         }
-        if(removed > 0) toast("Mega priority off for " + removed + " Mega(s): " + reason + ".");
     }
 
     private void poll(boolean immediate){

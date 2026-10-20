@@ -64,7 +64,7 @@ public class AutoDrillMod extends Mod{
 
     private void toggle(){
         if(!ready()) return;
-        if(armed){armed = false; toast("Auto-drill canceled."); return;}
+        if(armed){armed = false; return;}
         Block selected = Vars.control.input.block;
         drill = selected instanceof Drill selectedDrill ? selectedDrill : (Drill)Blocks.pneumaticDrill;
         if(!drill.unlockedNow() || !drill.isPlaceable()){

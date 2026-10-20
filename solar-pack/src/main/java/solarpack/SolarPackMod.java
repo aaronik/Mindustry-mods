@@ -98,7 +98,7 @@ public class SolarPackMod extends Mod{
     }
     private void toggle(){
         if(!ready()) return;
-        if(armed){armed = dragging = false; toast("Solar-pack canceled."); return;}
+        if(armed){armed = dragging = false; return;}
         if(!Blocks.largeSolarPanel.unlockedNow() || !Blocks.largeSolarPanel.isPlaceable() ||
             !Blocks.battery.unlockedNow() || !Blocks.battery.isPlaceable()){
             toast("Unlock large solar panels and small batteries first.");return;

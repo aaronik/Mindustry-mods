@@ -92,7 +92,7 @@ public class WallPackMod extends Mod{
     }
     private void toggle(){
         if(!ready()) return;
-        if(armed){armed = dragging = false; toast("Wall-pack canceled."); return;}
+        if(armed){armed = dragging = false; return;}
         Block[] pair = wallPair(Vars.control.input.block);
         smallWall = pair[0];
         largeWall = pair[1];
