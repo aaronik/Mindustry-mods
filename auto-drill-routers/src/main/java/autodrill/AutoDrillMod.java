@@ -133,8 +133,5 @@ public class AutoDrillMod extends Mod{
             router.onNewPlan(plan);
             Vars.player.unit().addBuild(plan);
         }
-        toast("Queued " + layout.drills().size() + " drills, " + layout.routers().size() +
-            " routers; ore covered " + layout.coveredTiles() + "/" + layout.oreTiles() +
-            (layout.truncated() ? " (patch scan capped)" : "") + ".");
     }
 }

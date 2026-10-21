@@ -11,7 +11,7 @@ Four independent **desktop Mindustry** mods: three construction planners and a M
 
 ## Install (no compilation needed)
 
-1. Download the three construction mods from the [latest stable release](https://github.com/Aaronik/Mindustry-mods/releases/latest). Mega Priority is an [experimental prerelease](https://github.com/Aaronik/Mindustry-mods/releases/tag/mega-priority-v0.1.4). **Download individual JAR assets**, not the GitHub “Source code” ZIP.
+1. Download the three construction mods from the [latest stable release](https://github.com/Aaronik/Mindustry-mods/releases/latest). Mega Priority is an [experimental prerelease](https://github.com/Aaronik/Mindustry-mods/releases/tag/mega-priority-v0.1.5). **Download individual JAR assets**, not the GitHub “Source code” ZIP.
 2. In Mindustry, open **Mods → Import Mod → Import File** and choose each JAR. Alternatively, copy each JAR into your active Mindustry `mods` folder. On the Steam macOS installation used to develop these mods, it is:
 
    ```text
@@ -37,5 +37,7 @@ MINDUSTRY_JAR=/path/to/desktop.jar ./build-all.sh
 ```
 
 If you have the same Steam macOS installation path shown above, `./build-all.sh` finds the game JAR automatically. Tests run as part of each build. Output files are `auto-drill-routers/dist/auto-drill-routers.jar`, `solar-pack/dist/solar-pack.jar`, `wall-pack/dist/wall-pack.jar`, and `mega-priority/dist/mega-priority.jar`. Each mod has its own instructions: [Auto Drill](auto-drill-routers/README.md), [Solar-pack](solar-pack/README.md), [Wall-pack](wall-pack/README.md), and [Mega Priority](mega-priority/README.md).
+
+Successful actions and cancellation are quiet; errors and invalid actions still show toasts.
 
 These are separate mods in one repository; install whichever ones you want. They are intended for the Steam desktop build and have not been validated on Android or other game versions.

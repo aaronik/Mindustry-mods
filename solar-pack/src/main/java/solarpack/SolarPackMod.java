@@ -150,6 +150,5 @@ public class SolarPackMod extends Mod{
             battery.onNewPlan(plan);
             Vars.player.unit().addBuild(plan);
         }
-        toast("Queued " + layout.panels().size() + " large solar panels and " + layout.batteries().size() + " small batteries.");
     }
 }

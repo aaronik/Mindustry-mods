@@ -162,6 +162,5 @@ public class WallPackMod extends Mod{
             battery.onNewPlan(plan);
             Vars.player.unit().addBuild(plan);
         }
-        toast("Queued " + layout.panels().size() + " large walls and " + layout.batteries().size() + " small walls (" + smallWall.localizedName + ").");
     }
 }

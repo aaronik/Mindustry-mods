@@ -3,6 +3,6 @@ displayName: Auto Drill Routers
 author: Aaron
 main: autodrill.AutoDrillMod
 description: Queue drills over a clicked ore patch and surround them with routers.
-version: 0.1.3
+version: 0.1.4
 minGameVersion: 160.7
 hidden: true

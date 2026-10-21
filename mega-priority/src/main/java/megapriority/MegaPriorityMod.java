@@ -97,10 +97,7 @@ public class MegaPriorityMod extends Mod{
             if(disable){managed.remove(id); lastRequested.remove(id); requestTime.remove(id);}
             else{managed.add(id); lastRequested.remove(id); requestTime.remove(id);}
         }
-        if(!disable){
-            poll(true);
-            toast("Mega priority enabled for " + selected.size + " Mega(s); target: " + lastDesired + ".");
-        }
+        if(!disable) poll(true);
     }
     private void toast(String text){
         if(Vars.ui != null && Vars.ui.hudfrag != null) Vars.ui.hudfrag.showToast(text);
