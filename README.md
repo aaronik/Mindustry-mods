@@ -1,44 +1,48 @@
-# Mindustry-mods
+# Mindustry Tools
 
-Five independent **desktop Mindustry** mods: four construction planners and a Mega command-switching tool. Tested by compiling against the Steam **160.7** game JAR and running automated tests. The planners queue normal construction plans; they do not instantly build anything. In-game UI and behavior are not covered by automated tests.
+One mod for **Mindustry Steam 160.7** with a compact **Tools** submenu. It combines five previously separate tools:
 
-| Mod | What it does |
+| Tool | What it does |
 | --- | --- |
-| [Auto Drill Routers](auto-drill-routers/) | Click an ore deposit to queue drills and a connected router border; defaults to the pneumatic drill. |
-| [Solar-pack](solar-pack/) | Drag a rectangle to pack large solar panels, then fill legal gaps with small batteries. Supports up to 200×200 tiles. |
-| [Wall-pack](wall-pack/) | Drag a rectangle to pack large walls, then fill legal gaps with small walls of the selected material. |
-| [Battery-pack](battery-pack/) | Drag a rectangle to pack large batteries, then fill legal gaps with small batteries. |
-| [Mega Priority](mega-priority/) | Opt selected Megas into vanilla Rebuild → Repair → Mine command switching. |
+| Auto-drill | Queues drills over an ore patch with a connected router border; defaults to pneumatic drills. |
+| Solar-pack | Packs 3×3 large solar panels in a dragged rectangle, then fills legal gaps with small batteries. |
+| Battery-pack | Packs 3×3 large batteries, then fills legal gaps with small batteries. |
+| Wall-pack | Packs 2×2 large walls of the selected material, then fills legal gaps with small walls. |
+| Mega priority | Opts selected Megas into vanilla Rebuild → Repair → Mine commands. |
 
-## Install (no compilation needed)
+## Install
 
-1. Download the four construction mods from the [latest stable release](https://github.com/Aaronik/Mindustry-mods/releases/latest). Mega Priority is an [experimental prerelease](https://github.com/Aaronik/Mindustry-mods/releases/tag/mega-priority-v0.1.7). **Download individual JAR assets**, not the GitHub “Source code” ZIP.
-2. In Mindustry, open **Mods → Import Mod → Import File** and choose each JAR. Alternatively, copy each JAR into your active Mindustry `mods` folder. On the Steam macOS installation used to develop these mods, it is:
+1. Download **`mindustry-tools.jar`** from the [latest release](https://github.com/aaronik/Mindustry-mods/releases/latest). Don't use the GitHub “Source code” ZIP.
+2. **Remove or disable all five old standalone mods** first: `auto-drill-routers`, `solar-pack`, `battery-pack`, `wall-pack`, and `mega-priority`. If both the old and combined mods are loaded, duplicate UI/input behavior will result. The old JARs may be kept as backups outside the active mods folder.
+3. In Mindustry, use **Mods → Import Mod → Import File** to select the JAR, or copy it into the game's active `mods` directory. On the Steam macOS installation used to develop this mod, that directory is:
 
    ```text
    ~/Library/Application Support/Steam/steamapps/common/Mindustry/Mindustry.app/Contents/Resources/saves/mods/
    ```
 
-   Other installations may use a different data directory; using the game's import option is safer.
-3. **Fully quit and restart Mindustry** after installing or updating. Do not replace a mod JAR while Mindustry is running: the game may fail to load helper classes later.
-4. Load a map. The construction buttons appear at the bottom, just left of the build menu, aligned on their right edges: **Mega priority**, **Wall-pack**, **Battery-pack**, **Solar-pack**, **Auto-drill** (top to bottom).
+4. **Fully quit and restart Mindustry.** Don't overwrite mod JARs while the game is running; delayed Java class loading may fail.
 
-For Mega Priority, select friendly Megas using the unit command controls and click **Mega priority** above Wall-pack. Opt-in resets when you change maps.
+If building/installing locally on the above Steam macOS installation, `cd mindustry-tools && ./install.sh` builds and verifies the combined JAR, moves the five old JARs to `mods/legacy-mindustry-mods-backup/`, and installs the new JAR atomically.
 
-Select a drill in the build menu before Auto-drill if you want something other than pneumatic. For Wall-pack, select a small or large wall to choose its material (default copper). Solar-pack requires large solar panels and small batteries to be unlocked; Battery-pack requires both battery sizes to be unlocked. Click a button to arm its tool; click ore for Auto-drill, or drag a map rectangle for the other two. Click an armed button again to cancel.
+## Use
 
-**Update:** Quit the game completely, replace/import the newer JAR(s), and restart. Uninstall by disabling the mod in the Mods menu or deleting its JAR and restarting.
+Click **Tools** beside the bottom-right build menu. The submenu expands upward with **Mega priority**, **Wall-pack**, **Battery-pack**, **Solar-pack**, and **Auto-drill**. Click **Tools** again to collapse it. An armed tool remains armed if the menu is collapsed; select it again to cancel. Choosing another construction tool disarms the previous one.
 
-## Build from source
+* **Auto-drill:** Select a drill first (or use the unlocked pneumatic fallback), select Auto-drill, then click an ore patch.
+* **Solar-pack / Battery-pack / Wall-pack:** Select the tool, then drag out a rectangular area. Select a wall type first if you want a material other than copper.
+* **Mega priority:** Select friendly Megas in command mode and choose Mega priority. Choosing a vanilla command disables automation for those selected Megas. This opt-in resets when a new map loads.
 
-Install a Java 17+ JDK and Mindustry desktop 160.7. Run:
+The construction tools avoid existing buildings and your queued plans, but can build over removable natural props. Solar-pack and Battery-pack have a 200×200-tile selection limit; Wall-pack has a 60-tile-per-side, 2,500-tile-area limit. Tools do not instantly construct blocks. Success and cancellation are silent; errors show toasts.
+
+## Build and test
+
+Install a Java 17+ JDK and obtain the Mindustry 160.7 desktop JAR, then run:
 
 ```sh
-MINDUSTRY_JAR=/path/to/desktop.jar ./build-all.sh
+cd mindustry-tools
+MINDUSTRY_JAR=/path/to/desktop.jar ./build.sh
 ```
 
-If you have the same Steam macOS installation path shown above, `./build-all.sh` finds the game JAR automatically. Tests run as part of each build. Output files are `auto-drill-routers/dist/auto-drill-routers.jar`, `solar-pack/dist/solar-pack.jar`, `battery-pack/dist/battery-pack.jar`, `wall-pack/dist/wall-pack.jar`, and `mega-priority/dist/mega-priority.jar`. Each mod has its own instructions: [Auto Drill](auto-drill-routers/README.md), [Solar-pack](solar-pack/README.md), [Battery-pack](battery-pack/README.md), [Wall-pack](wall-pack/README.md), and [Mega Priority](mega-priority/README.md).
+On the Steam macOS installation above, `./build.sh` finds `desktop.jar` automatically. It compiles the combined mod and runs all five existing planner/priority test suites. The output is `mindustry-tools/dist/mindustry-tools.jar`. **The combined submenu has not yet been manually tested in-game.**
 
-Successful actions and cancellation are quiet; errors and invalid actions still show toasts.
-
-These are separate mods in one repository; install whichever ones you want. They are intended for the Steam desktop build and have not been validated on Android or other game versions.
+The former standalone projects remain in this repository under their respective directories as legacy source/history; they should **not** be installed alongside Mindustry Tools. See [combined mod details](mindustry-tools/README.md).

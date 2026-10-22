@@ -1,0 +1,8 @@
+name: mindustry-tools
+displayName: Mindustry Tools
+author: Aaron
+main: mindustrytools.MindustryToolsMod
+description: Auto-drill, Solar-pack, Battery-pack, Wall-pack and Mega Priority in one menu.
+version: 1.0.0
+minGameVersion: 160.7
+hidden: true
