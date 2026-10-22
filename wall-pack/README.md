@@ -1,6 +1,6 @@
 # Wall-pack (Mindustry Steam 160.7)
 
-Separate desktop mod. Select a wall type (small or large) in the build menu, click **Wall-pack** above Solar-pack, then drag a rectangle across the map. On release it queues as many **2×2 large walls** of that material as the heuristic can fit, followed by **1×1 walls** on every remaining legal tile. No construction is instant. Copper walls are the fallback if no supported wall type is selected.
+Separate desktop mod. Select a wall type (small or large) in the build menu, click **Wall-pack** above Battery-pack, then drag a rectangle across the map. On release it queues as many **2×2 large walls** of that material as the heuristic can fit, followed by **1×1 walls** on every remaining legal tile. No construction is instant. Copper walls are the fallback if no supported wall type is selected.
 
 Supported pairs: copper, titanium, plastanium, thorium, phase, surge, beryllium, tungsten, and reinforced surge. Both wall sizes must be unlocked. Existing structures and your current builder's queued placements are not replaced. All wall footprints stay inside the selection; game placement rules still apply. Click the button again before dragging to cancel.
 

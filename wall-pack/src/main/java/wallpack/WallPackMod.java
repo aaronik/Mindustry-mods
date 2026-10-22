@@ -68,7 +68,7 @@ public class WallPackMod extends Mod{
                 hud.table(buttons -> buttons.button("Wall-pack", Styles.togglet, this::toggle)
                     .checked(button -> armed).size(155f,45f)
                     .tooltip("Select any wall material, click Wall-pack, then drag an area. Click again to cancel."))
-                    .padRight(316f).padBottom(108f);
+                    .padRight(316f).padBottom(159f);
             });
         });
         Events.run(Trigger.update, () -> {

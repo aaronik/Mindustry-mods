@@ -74,7 +74,7 @@ public class BatteryPackMod extends Mod{
                 hud.table(buttons -> buttons.button("Battery-pack", Styles.togglet, this::toggle)
                     .checked(button -> armed).size(155f,45f)
                     .tooltip("Click Battery-pack, then drag a rectangle over the map. Click again to cancel."))
-                    .padRight(477f).padBottom(57f);
+                    .padRight(316f).padBottom(108f);
             });
         });
         Events.run(Trigger.update, () -> {

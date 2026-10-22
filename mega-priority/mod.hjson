@@ -3,6 +3,6 @@ displayName: Mega Priority
 author: Aaron
 main: megapriority.MegaPriorityMod
 description: Opt-in Mega command cycling: rebuild, repair, then mine.
-version: 0.1.5
+version: 0.1.6
 minGameVersion: 160.7
 hidden: true

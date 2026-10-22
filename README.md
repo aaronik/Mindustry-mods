@@ -12,7 +12,7 @@ Five independent **desktop Mindustry** mods: four construction planners and a Me
 
 ## Install (no compilation needed)
 
-1. Download the existing construction mods from the [latest stable release](https://github.com/Aaronik/Mindustry-mods/releases/latest). Battery-pack is currently available in its [first release](https://github.com/Aaronik/Mindustry-mods/releases/tag/battery-pack-v0.1.0). Mega Priority is an [experimental prerelease](https://github.com/Aaronik/Mindustry-mods/releases/tag/mega-priority-v0.1.5). **Download individual JAR assets**, not the GitHub “Source code” ZIP.
+1. Download the four construction mods from the [latest stable release](https://github.com/Aaronik/Mindustry-mods/releases/latest). Mega Priority is an [experimental prerelease](https://github.com/Aaronik/Mindustry-mods/releases/tag/mega-priority-v0.1.6). **Download individual JAR assets**, not the GitHub “Source code” ZIP.
 2. In Mindustry, open **Mods → Import Mod → Import File** and choose each JAR. Alternatively, copy each JAR into your active Mindustry `mods` folder. On the Steam macOS installation used to develop these mods, it is:
 
    ```text
@@ -21,7 +21,7 @@ Five independent **desktop Mindustry** mods: four construction planners and a Me
 
    Other installations may use a different data directory; using the game's import option is safer.
 3. **Fully quit and restart Mindustry** after installing or updating. Do not replace a mod JAR while Mindustry is running: the game may fail to load helper classes later.
-4. Load a map. The construction buttons appear at the bottom, just left of the build menu, aligned on their right edges: **Wall-pack**, **Solar-pack**, **Auto-drill** (top to bottom), with **Battery-pack** just left of Solar-pack.
+4. Load a map. The construction buttons appear at the bottom, just left of the build menu, aligned on their right edges: **Mega priority**, **Wall-pack**, **Battery-pack**, **Solar-pack**, **Auto-drill** (top to bottom).
 
 For Mega Priority, select friendly Megas using the unit command controls and click **Mega priority** above Wall-pack. Opt-in resets when you change maps.
 

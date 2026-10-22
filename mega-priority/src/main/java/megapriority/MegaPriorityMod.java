@@ -61,7 +61,7 @@ public class MegaPriorityMod extends Mod{
                     button.setProgrammaticChangeEvents(false);
                     button.clicked(this::toggleSelection);
                     button.update(() -> button.setChecked(selectedAllManaged()));
-                }).padRight(316f).padBottom(159f);
+                }).padRight(316f).padBottom(210f);
             });
         });
         Events.run(Trigger.update, this::update);

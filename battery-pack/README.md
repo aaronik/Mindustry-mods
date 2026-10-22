@@ -1,6 +1,6 @@
 # Battery-pack (Mindustry Steam 160.7)
 
-A separate desktop construction-planner mod. Click **Battery-pack** immediately left of Solar-pack, then drag a rectangle on the map. It queues as many **3×3 large batteries** as the layout heuristic can fit, then fills remaining legal tiles with **1×1 small batteries**. It doesn't build anything instantly.
+A separate desktop construction-planner mod. Click **Battery-pack** directly above Solar-pack, aligned on the right with the other buttons, then drag a rectangle on the map. It queues as many **3×3 large batteries** as the layout heuristic can fit, then fills remaining legal tiles with **1×1 small batteries**. It doesn't build anything instantly.
 
 Both battery types must be unlocked and placeable. It skips existing structures and the local player's queued placements. Natural props that Mindustry normally clears automatically can be built over. Large batteries stay entirely within the selected rectangle. Maximum selection: 200 tiles per side and 40,000 tiles total. Click the button again before dragging to cancel. Activation, cancellation and success are silent; invalid actions show error toasts.
 
