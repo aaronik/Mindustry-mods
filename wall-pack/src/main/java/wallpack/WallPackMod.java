@@ -66,7 +66,7 @@ public class WallPackMod extends Mod{
                 hud.bottom().right();
                 hud.visible(() -> ready() && Vars.ui.hudfrag.shown() && !Vars.control.input.commandMode);
                 hud.table(buttons -> buttons.button("Wall-pack", Styles.togglet, this::toggle)
-                    .checked(button -> armed).size(155f,45f)
+                    .checked(button -> armed).size(175f,45f)
                     .tooltip("Select any wall material, click Wall-pack, then drag an area. Click again to cancel."))
                     .padRight(316f).padBottom(159f);
             });

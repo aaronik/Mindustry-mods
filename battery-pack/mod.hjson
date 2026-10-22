@@ -3,6 +3,6 @@ displayName: Battery-pack
 author: Aaron
 main: batterypack.BatteryPackMod
 description: Drag a rectangle to queue large batteries with small battery infill.
-version: 0.1.1
+version: 0.1.2
 minGameVersion: 160.7
 hidden: true

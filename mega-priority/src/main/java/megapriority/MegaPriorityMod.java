@@ -54,7 +54,7 @@ public class MegaPriorityMod extends Mod{
                 hud.visible(() -> ready() && Vars.ui.hudfrag.shown());
                 hud.table(t -> {
                     var button = t.button("Mega priority", Styles.togglet, null)
-                        .size(155f,45f)
+                        .size(175f,45f)
                         .tooltip("Select Megas, then toggle automatic Rebuild > Repair > Mine.").get();
                     // Checked-state updates are visual only. The default Cell.checked()
                     // fires ChangeEvents, which would call toggleSelection again.

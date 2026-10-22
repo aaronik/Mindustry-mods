@@ -52,7 +52,7 @@ public class AutoDrillMod extends Mod{
                 hud.visible(() -> ready() && Vars.ui.hudfrag.shown() && !Vars.control.input.commandMode);
                 hud.table(buttons -> {
                     buttons.button("Auto-drill", Styles.togglet, this::toggle)
-                        .checked(button -> armed).size(155f, 45f)
+                        .checked(button -> armed).size(175f, 45f)
                         .tooltip("Select a drill, click Auto-drill, then click ore. Click again to cancel.");
                 }).padRight(316f).padBottom(6f);
             });
