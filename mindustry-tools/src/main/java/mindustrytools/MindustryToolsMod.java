@@ -9,6 +9,7 @@ import batterypack.BatteryPackMod;
 import megapriority.MegaPriorityMod;
 import mindustry.Vars;
 import mindustry.game.EventType.ClientLoadEvent;
+import mindustry.game.EventType.WorldLoadEvent;
 import mindustry.mod.Mod;
 import mindustry.ui.Styles;
 import solarpack.SolarPackMod;
@@ -24,6 +25,7 @@ public class MindustryToolsMod extends Mod{
     private boolean packOpen, hudInstalled;
 
     public MindustryToolsMod(){
+        Events.on(WorldLoadEvent.class, event -> packOpen = false);
         Events.on(ClientLoadEvent.class, event -> {
             if(hudInstalled) return;
             hudInstalled = true;
@@ -36,18 +38,26 @@ public class MindustryToolsMod extends Mod{
                     options.right();
                     option(options, "Mega priority", mega::selectedAllManagedNow, mega::toggleSelection);
                     options.row();
-                    options.collapser(packs -> {
-                        packs.right();
-                        option(packs, "Wall-pack", wall::armed, () -> select(Tool.wall));
-                        packs.row();
-                        option(packs, "Battery-pack", battery::armed, () -> select(Tool.battery));
-                        packs.row();
-                        option(packs, "Solar-pack", solar::armed, () -> select(Tool.solar));
-                    }, true, () -> !packOpen).row();
                     option(options, "Pack", () -> packOpen, () -> packOpen = !packOpen);
                     options.row();
                     option(options, "Auto-drill", drill::armed, () -> select(Tool.drill));
                 }).padRight(316f).padBottom(6f);
+            });
+            // Independent bottom-right overlay: parent buttons stay fixed
+            // while the pack buttons appear immediately to their left.
+            Vars.ui.hudGroup.fill(popup -> {
+                popup.touchable = Touchable.childrenOnly;
+                popup.bottom().right();
+                popup.visible(() -> packOpen && Vars.state != null && Vars.state.isGame() &&
+                    Vars.ui.hudfrag.shown() && Vars.control != null && Vars.control.input != null);
+                popup.table(packs -> {
+                    packs.right();
+                    option(packs, "Wall-pack", wall::armed, () -> select(Tool.wall));
+                    packs.row();
+                    option(packs, "Battery-pack", battery::armed, () -> select(Tool.battery));
+                    packs.row();
+                    option(packs, "Solar-pack", solar::armed, () -> select(Tool.solar));
+                }).padRight(497f).padBottom(57f);
             });
         });
     }
