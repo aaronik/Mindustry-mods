@@ -52,9 +52,9 @@ public class MindustryToolsMod extends Mod{
                     Vars.ui.hudfrag.shown() && Vars.control != null && Vars.control.input != null);
                 popup.table(packs -> {
                     packs.right();
-                    option(packs, "Wall-pack", wall::armed, () -> select(Tool.wall));
-                    option(packs, "Battery-pack", battery::armed, () -> select(Tool.battery));
-                    option(packs, "Solar-pack", solar::armed, () -> select(Tool.solar));
+                    option(packs, "Wall", wall::armed, () -> select(Tool.wall));
+                    option(packs, "Battery", battery::armed, () -> select(Tool.battery));
+                    option(packs, "Solar", solar::armed, () -> select(Tool.solar));
                 }).padRight(497f).padBottom(6f);
             });
         });
