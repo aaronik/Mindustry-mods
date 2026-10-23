@@ -44,7 +44,7 @@ public class MindustryToolsMod extends Mod{
                 }).padRight(316f).padBottom(6f);
             });
             // Independent bottom-right overlay: parent buttons stay fixed
-            // while the pack buttons appear immediately to their left.
+            // while the three pack buttons appear in a row to Pack's left.
             Vars.ui.hudGroup.fill(popup -> {
                 popup.touchable = Touchable.childrenOnly;
                 popup.bottom().right();
@@ -53,9 +53,7 @@ public class MindustryToolsMod extends Mod{
                 popup.table(packs -> {
                     packs.right();
                     option(packs, "Wall-pack", wall::armed, () -> select(Tool.wall));
-                    packs.row();
                     option(packs, "Battery-pack", battery::armed, () -> select(Tool.battery));
-                    packs.row();
                     option(packs, "Solar-pack", solar::armed, () -> select(Tool.solar));
                 }).padRight(497f).padBottom(57f);
             });

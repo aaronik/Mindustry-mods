@@ -14,7 +14,7 @@ If building locally on that machine, `./install.sh` compiles, verifies the JAR, 
 
 ## Use
 
-**Mega priority**, **Pack**, and **Auto-drill** are always visible just left of the build menu. **Pack** is the only submenu and starts closed; click it to reveal **Wall-pack**, **Battery-pack**, and **Solar-pack** in a second column on the left, without moving the main buttons. Click Pack again to close it. An active tool is highlighted. Choosing a different construction tool disarms the previous one. Closing Pack does not cancel an armed tool; reopen it and click that tool again to cancel.
+**Mega priority**, **Pack**, and **Auto-drill** are always visible just left of the build menu. **Pack** is the only submenu and starts closed; click it to reveal **Wall-pack**, **Battery-pack**, and **Solar-pack** in a single row to its left, aligned with Pack, without moving the main buttons. Click Pack again to close it. An active tool is highlighted. Choosing a different construction tool disarms the previous one. Closing Pack does not cancel an armed tool; reopen it and click that tool again to cancel.
 
 * **Auto-drill:** Select a drill first (defaults to unlocked pneumatic drill), arm it, then click an ore patch. Queues drills plus a connected router border.
 * **Solar-pack:** Arm, then drag a rectangle. Queues large solar panels, filling remaining legal tiles with small batteries.
