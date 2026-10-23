@@ -38,9 +38,9 @@ public class MindustryToolsMod extends Mod{
                     options.right();
                     option(options, "Mega priority", mega::selectedAllManagedNow, mega::toggleSelection);
                     options.row();
-                    option(options, "Pack", () -> packOpen, () -> packOpen = !packOpen);
-                    options.row();
                     option(options, "Auto-drill", drill::armed, () -> select(Tool.drill));
+                    options.row();
+                    option(options, "Pack", () -> packOpen, () -> packOpen = !packOpen);
                 }).padRight(316f).padBottom(6f);
             });
             // Independent bottom-right overlay: parent buttons stay fixed
@@ -55,7 +55,7 @@ public class MindustryToolsMod extends Mod{
                     option(packs, "Wall-pack", wall::armed, () -> select(Tool.wall));
                     option(packs, "Battery-pack", battery::armed, () -> select(Tool.battery));
                     option(packs, "Solar-pack", solar::armed, () -> select(Tool.solar));
-                }).padRight(497f).padBottom(57f);
+                }).padRight(497f).padBottom(6f);
             });
         });
     }
