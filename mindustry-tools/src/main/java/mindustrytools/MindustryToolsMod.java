@@ -7,6 +7,7 @@ import arc.scene.ui.layout.Table;
 import autodrill.AutoDrillMod;
 import batterypack.BatteryPackMod;
 import megapriority.MegaPriorityMod;
+import minepack.MinePackMod;
 import mindustry.Vars;
 import mindustry.game.EventType.ClientLoadEvent;
 import mindustry.game.EventType.WorldLoadEvent;
@@ -21,6 +22,7 @@ public class MindustryToolsMod extends Mod{
     private final SolarPackMod solar = new SolarPackMod();
     private final BatteryPackMod battery = new BatteryPackMod();
     private final WallPackMod wall = new WallPackMod();
+    private final MinePackMod mine = new MinePackMod();
     private final MegaPriorityMod mega = new MegaPriorityMod();
     private boolean packOpen, hudInstalled;
 
@@ -44,7 +46,7 @@ public class MindustryToolsMod extends Mod{
                 }).padRight(316f).padBottom(6f);
             });
             // Independent bottom-right overlay: parent buttons stay fixed
-            // while the three pack buttons appear in a row to Pack's left.
+            // while four pack buttons appear in a row to Pack's left.
             Vars.ui.hudGroup.fill(popup -> {
                 popup.touchable = Touchable.childrenOnly;
                 popup.bottom().right();
@@ -55,6 +57,7 @@ public class MindustryToolsMod extends Mod{
                     option(packs, "Wall", wall::armed, () -> select(Tool.wall));
                     option(packs, "Battery", battery::armed, () -> select(Tool.battery));
                     option(packs, "Solar", solar::armed, () -> select(Tool.solar));
+                    option(packs, "Mine", mine::armed, () -> select(Tool.mine));
                 }).padRight(497f).padBottom(6f);
             });
         });
@@ -66,17 +69,19 @@ public class MindustryToolsMod extends Mod{
         button.clicked(action);
         button.update(() -> button.setChecked(checked.get()));
     }
-    private enum Tool{drill,solar,battery,wall}
+    private enum Tool{drill,solar,battery,wall,mine}
     private void select(Tool tool){
         if(tool != Tool.drill && drill.armed()) drill.toggle();
         if(tool != Tool.solar && solar.armed()) solar.toggle();
         if(tool != Tool.battery && battery.armed()) battery.toggle();
         if(tool != Tool.wall && wall.armed()) wall.toggle();
+        if(tool != Tool.mine && mine.armed()) mine.toggle();
         switch(tool){
             case drill -> drill.toggle();
             case solar -> solar.toggle();
             case battery -> battery.toggle();
             case wall -> wall.toggle();
+            case mine -> mine.toggle();
         }
         // Pack stays open until its button is clicked again.
     }

@@ -1,6 +1,6 @@
 # Mindustry Tools
 
-One mod for **Mindustry Steam 160.7** with a compact **Pack** submenu. It combines five previously separate tools:
+One mod for **Mindustry Steam 160.7** with a compact **Pack** submenu. It combines five previously separate tools plus Mine packing:
 
 | Tool | What it does |
 | --- | --- |
@@ -9,6 +9,7 @@ One mod for **Mindustry Steam 160.7** with a compact **Pack** submenu. It combin
 | Battery-pack | Packs 3×3 large batteries, then fills legal gaps with small batteries. |
 | Wall-pack | Packs 2×2 large walls of the selected material, then fills legal gaps with small walls. |
 | Mega priority | Opts selected Megas into vanilla Rebuild → Repair → Mine commands. |
+| Mine (Pack submenu) | Densely fills a selected rectangle with 1×1 Shock Mines. |
 
 ## Install
 
@@ -26,13 +27,13 @@ If building/installing locally on the above Steam macOS installation, `cd mindus
 
 ## Use
 
-Beside the bottom-right build menu, **Mega priority**, **Auto-drill**, and **Pack** are always visible (top to bottom). **Pack** is the bottom button and starts closed; click it to show **Wall**, **Battery**, and **Solar** in a single row to its left, and click again to hide them. The main buttons stay in place. An armed packing tool stays armed if Pack is closed; open Pack and select it again to cancel. Choosing another construction tool disarms the previous one.
+Beside the bottom-right build menu, **Mega priority**, **Auto-drill**, and **Pack** are always visible (top to bottom). **Pack** is the bottom button and starts closed; click it to show **Wall**, **Battery**, **Solar**, and **Mine** in a single row to its left, and click again to hide them. The main buttons stay in place. An armed packing tool stays armed if Pack is closed; open Pack and select it again to cancel. Choosing another construction tool disarms the previous one.
 
 * **Auto-drill:** Select a drill first (or use the unlocked pneumatic fallback), select Auto-drill, then click an ore patch.
-* **Solar-pack / Battery-pack / Wall-pack:** Select the tool, then drag out a rectangular area. Select a wall type first if you want a material other than copper.
+* **Solar / Battery / Wall / Mine:** Choose an option under Pack, then drag out a rectangular area. Mine queues Shock Mines; select a wall type first if you want a material other than copper.
 * **Mega priority:** Select friendly Megas in command mode and choose Mega priority. Choosing a vanilla command disables automation for those selected Megas. This opt-in resets when a new map loads.
 
-The construction tools avoid existing buildings and your queued plans, but can build over removable natural props. Solar-pack and Battery-pack have a 200×200-tile selection limit; Wall-pack has a 60-tile-per-side, 2,500-tile-area limit. Tools do not instantly construct blocks. Success and cancellation are silent; errors show toasts.
+The construction tools avoid existing buildings and your queued plans, but can build over removable natural props. Solar-pack and Battery-pack have a 200×200-tile selection limit; Wall-pack and Mine each have a 60-tile-per-side, 2,500-tile-area limit. Tools do not instantly construct blocks. Success and cancellation are silent; errors show toasts.
 
 ## Build and test
 
