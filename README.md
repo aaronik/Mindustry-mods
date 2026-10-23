@@ -26,7 +26,7 @@ If building/installing locally on the above Steam macOS installation, `cd mindus
 
 ## Use
 
-Click **Tools** beside the bottom-right build menu. The submenu expands upward with **Mega priority**, **Wall-pack**, **Battery-pack**, **Solar-pack**, and **Auto-drill**. Click **Tools** again to collapse it. An armed tool remains armed if the menu is collapsed; select it again to cancel. Choosing another construction tool disarms the previous one.
+Click **Tools** beside the bottom-right build menu. Its submenu contains **Mega priority**, **Pack**, and **Auto-drill**. Click **Pack** to expand **Wall-pack**, **Battery-pack**, and **Solar-pack** above it. Click either parent button again to collapse its submenu. An armed tool remains armed if the menu is collapsed; select it again to cancel. Choosing another construction tool disarms the previous one.
 
 * **Auto-drill:** Select a drill first (or use the unlocked pneumatic fallback), select Auto-drill, then click an ore patch.
 * **Solar-pack / Battery-pack / Wall-pack:** Select the tool, then drag out a rectangular area. Select a wall type first if you want a material other than copper.

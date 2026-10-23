@@ -21,7 +21,7 @@ public class MindustryToolsMod extends Mod{
     private final BatteryPackMod battery = new BatteryPackMod();
     private final WallPackMod wall = new WallPackMod();
     private final MegaPriorityMod mega = new MegaPriorityMod();
-    private boolean open, hudInstalled;
+    private boolean open, packOpen, hudInstalled;
 
     public MindustryToolsMod(){
         Events.on(ClientLoadEvent.class, event -> {
@@ -36,13 +36,17 @@ public class MindustryToolsMod extends Mod{
                     stack.right();
                     stack.collapser(options -> {
                         options.right();
-                        option(options, "Mega priority", () -> mega.selectedAllManagedNow(), mega::toggleSelection);
+                        option(options, "Mega priority", mega::selectedAllManagedNow, mega::toggleSelection);
                         options.row();
-                        option(options, "Wall-pack", wall::armed, () -> select(Tool.wall));
-                        options.row();
-                        option(options, "Battery-pack", battery::armed, () -> select(Tool.battery));
-                        options.row();
-                        option(options, "Solar-pack", solar::armed, () -> select(Tool.solar));
+                        options.collapser(packs -> {
+                            packs.right();
+                            option(packs, "Wall-pack", wall::armed, () -> select(Tool.wall));
+                            packs.row();
+                            option(packs, "Battery-pack", battery::armed, () -> select(Tool.battery));
+                            packs.row();
+                            option(packs, "Solar-pack", solar::armed, () -> select(Tool.solar));
+                        }, true, () -> !packOpen).row();
+                        option(options, "Pack", () -> packOpen, () -> packOpen = !packOpen);
                         options.row();
                         option(options, "Auto-drill", drill::armed, () -> select(Tool.drill));
                     }, true, () -> !open).row();
