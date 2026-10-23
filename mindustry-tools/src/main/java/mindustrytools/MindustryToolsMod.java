@@ -14,14 +14,14 @@ import mindustry.ui.Styles;
 import solarpack.SolarPackMod;
 import wallpack.WallPackMod;
 
-/** One HUD submenu for all five tools; only this class is the mod entrypoint. */
+/** One HUD column for all five tools; Pack is the sole submenu. */
 public class MindustryToolsMod extends Mod{
     private final AutoDrillMod drill = new AutoDrillMod();
     private final SolarPackMod solar = new SolarPackMod();
     private final BatteryPackMod battery = new BatteryPackMod();
     private final WallPackMod wall = new WallPackMod();
     private final MegaPriorityMod mega = new MegaPriorityMod();
-    private boolean open, packOpen, hudInstalled;
+    private boolean packOpen, hudInstalled;
 
     public MindustryToolsMod(){
         Events.on(ClientLoadEvent.class, event -> {
@@ -32,29 +32,21 @@ public class MindustryToolsMod extends Mod{
                 hud.bottom().right();
                 hud.visible(() -> Vars.state != null && Vars.state.isGame() &&
                     Vars.ui.hudfrag.shown() && Vars.control != null && Vars.control.input != null);
-                hud.table(stack -> {
-                    stack.right();
-                    stack.collapser(options -> {
-                        options.right();
-                        option(options, "Mega priority", mega::selectedAllManagedNow, mega::toggleSelection);
-                        options.row();
-                        options.collapser(packs -> {
-                            packs.right();
-                            option(packs, "Wall-pack", wall::armed, () -> select(Tool.wall));
-                            packs.row();
-                            option(packs, "Battery-pack", battery::armed, () -> select(Tool.battery));
-                            packs.row();
-                            option(packs, "Solar-pack", solar::armed, () -> select(Tool.solar));
-                        }, true, () -> !packOpen).row();
-                        option(options, "Pack", () -> packOpen, () -> packOpen = !packOpen);
-                        options.row();
-                        option(options, "Auto-drill", drill::armed, () -> select(Tool.drill));
-                    }, true, () -> !open).row();
-                    var toggle = stack.button("Tools", Styles.togglet, null).size(175f,45f)
-                        .tooltip("Show or hide building and Mega tools.").get();
-                    toggle.setProgrammaticChangeEvents(false);
-                    toggle.clicked(() -> open = !open);
-                    toggle.update(() -> toggle.setChecked(open));
+                hud.table(options -> {
+                    options.right();
+                    option(options, "Mega priority", mega::selectedAllManagedNow, mega::toggleSelection);
+                    options.row();
+                    options.collapser(packs -> {
+                        packs.right();
+                        option(packs, "Wall-pack", wall::armed, () -> select(Tool.wall));
+                        packs.row();
+                        option(packs, "Battery-pack", battery::armed, () -> select(Tool.battery));
+                        packs.row();
+                        option(packs, "Solar-pack", solar::armed, () -> select(Tool.solar));
+                    }, true, () -> !packOpen).row();
+                    option(options, "Pack", () -> packOpen, () -> packOpen = !packOpen);
+                    options.row();
+                    option(options, "Auto-drill", drill::armed, () -> select(Tool.drill));
                 }).padRight(316f).padBottom(6f);
             });
         });
@@ -78,6 +70,6 @@ public class MindustryToolsMod extends Mod{
             case battery -> battery.toggle();
             case wall -> wall.toggle();
         }
-        // Keep menu open while choosing tools; collapse with Tools.
+        // Pack stays open until its button is clicked again.
     }
 }
