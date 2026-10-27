@@ -33,7 +33,7 @@ Beside the bottom-right build menu, **Mega priority**, **Auto-drill**, and **Pac
 * **Solar / Battery / Wall / Mine:** Choose an option under Pack, then drag out a rectangular area. Mine queues Shock Mines; select a wall type first if you want a material other than copper.
 * **Mega priority:** Select friendly Megas in command mode and choose Mega priority. Choosing a vanilla command disables automation for those selected Megas. This opt-in resets when a new map loads.
 
-The construction tools avoid existing buildings and your queued plans, but can build over removable natural props. Solar-pack and Battery-pack have a 200×200-tile selection limit; Wall-pack and Mine each have a 60-tile-per-side, 2,500-tile-area limit. Tools do not instantly construct blocks. Success and cancellation are silent; errors show toasts.
+All four Pack modes (and Auto-drill) avoid existing buildings and your queued plans, but can build over removable natural props. Solar-pack and Battery-pack have a 200×200-tile selection limit; Wall-pack and Mine each have a 60-tile-per-side, 2,500-tile-area limit. Tools do not instantly construct blocks. Success and cancellation are silent; errors show toasts.
 
 ## Build and test
 

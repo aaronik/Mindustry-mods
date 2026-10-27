@@ -23,7 +23,7 @@ If building locally on that machine, `./install.sh` compiles, verifies the JAR, 
 * **Mine:** Arm and drag a rectangle. Queues 1×1 Shock Mines on every valid tile (up to 60 tiles per side and 2,500 tiles per drag).
 * **Mega priority:** Select friendly Megas in command mode, then toggle. Uses vanilla Rebuild → Repair → Mine commands based on available work. Selecting a vanilla command opts those Megas out.
 
-Terrain props that the game automatically replaces are allowed; buildings and your queued plans are not overwritten. Construction modes queue normal build plans. The mod is quiet on successful actions/cancellation; invalid actions show toasts. Mega Priority is opt-in and resets on world load.
+All four Pack modes may build over natural props that the game automatically replaces; buildings and your queued plans are not overwritten. Construction modes queue normal build plans. The mod is quiet on successful actions/cancellation; invalid actions show toasts. Mega Priority is opt-in and resets on world load.
 
 ## Build/test
 

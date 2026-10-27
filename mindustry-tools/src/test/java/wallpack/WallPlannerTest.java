@@ -37,6 +37,11 @@ public class WallPlannerTest{
             for(int y=0;y<12;y++)for(int x=0;x<12;x++)if(r.nextFloat()<0.14)random.blocked.add(new WallPlanner.Point(x,y));
             verify(random,WallPlanner.plan(random,0,0,11,11,2,0),0,0,11,11,2,0);
         }
+        check(WallPackMod.mayPlaceOver(true,false,false),"empty tile should be buildable");
+        check(WallPackMod.mayPlaceOver(false,true,false),"removable props should be buildable");
+        check(!WallPackMod.mayPlaceOver(false,false,false),"unreplaceable terrain should remain blocked");
+        check(!WallPackMod.mayPlaceOver(false,true,true),"buildings must not be replaced");
+        check(!WallPackMod.mayPlaceOver(true,false,true),"buildings on air tiles must remain blocked");
         System.out.println("Wall-pack layout tests passed");
     }
 }
