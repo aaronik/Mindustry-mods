@@ -46,6 +46,6 @@ cd mindustry-tools
 MINDUSTRY_JAR=/path/to/desktop.jar ./build.sh
 ```
 
-On the Steam macOS installation above, `./build.sh` finds `desktop.jar` automatically. It compiles the combined mod and runs all five existing planner/priority test suites. The output is `mindustry-tools/dist/mindustry-tools.jar`. **The combined submenu has not yet been manually tested in-game.**
+On the Steam macOS installation above, `./build.sh` finds `desktop.jar` automatically. It compiles the combined mod and runs the planner/priority tests, including map-like Surge route scenarios for cliffs, props, buildings, insulated links, competing sources, and map edges. The output is `mindustry-tools/dist/mindustry-tools.jar`. **The combined submenu has not yet been manually tested in-game.**
 
 The former standalone projects remain in this repository under their respective directories as legacy source/history; they should **not** be installed alongside Mindustry Tools. See [combined mod details](mindustry-tools/README.md).

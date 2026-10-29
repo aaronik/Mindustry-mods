@@ -28,4 +28,4 @@ All four Pack modes may build over natural props that the game automatically rep
 
 ## Build/test
 
-Run `./build.sh` with Java 17+ and a Mindustry 160.7 desktop JAR. It compiles and runs all five existing decision/layout test suites. Combined menu behavior still needs in-game verification.
+Run `./build.sh` with Java 17+ and a Mindustry 160.7 desktop JAR. It compiles and runs all planner/priority suites, including deterministic Surge route fixtures for map edges, cliffs, removable props, buildings, insulated links, competing sources, blocked destinations, long routes, and seeded irregular maps. These are synthetic map-like fixtures, not actual save files. Combined UI and live construction/power-link synchronization still need in-game verification.
