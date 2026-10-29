@@ -14,11 +14,13 @@ import mindustry.game.EventType.WorldLoadEvent;
 import mindustry.mod.Mod;
 import mindustry.ui.Styles;
 import solarpack.SolarPackMod;
+import surgeroute.SurgeRouteMod;
 import wallpack.WallPackMod;
 
 /** One HUD column for all five tools; Pack is the sole submenu. */
 public class MindustryToolsMod extends Mod{
     private final AutoDrillMod drill = new AutoDrillMod();
+    private final SurgeRouteMod surge = new SurgeRouteMod();
     private final SolarPackMod solar = new SolarPackMod();
     private final BatteryPackMod battery = new BatteryPackMod();
     private final WallPackMod wall = new WallPackMod();
@@ -41,6 +43,8 @@ public class MindustryToolsMod extends Mod{
                     option(options, "Mega priority", mega::selectedAllManagedNow, mega::toggleSelection);
                     options.row();
                     option(options, "Auto-drill", drill::armed, () -> select(Tool.drill));
+                    options.row();
+                    option(options, "Surge", surge::armed, () -> select(Tool.surge));
                     options.row();
                     option(options, "Pack", () -> packOpen, () -> packOpen = !packOpen);
                 }).padRight(316f).padBottom(6f);
@@ -69,15 +73,17 @@ public class MindustryToolsMod extends Mod{
         button.clicked(action);
         button.update(() -> button.setChecked(checked.get()));
     }
-    private enum Tool{drill,solar,battery,wall,mine}
+    private enum Tool{drill,surge,solar,battery,wall,mine}
     private void select(Tool tool){
         if(tool != Tool.drill && drill.armed()) drill.toggle();
+        if(tool != Tool.surge && surge.armed()) surge.toggle();
         if(tool != Tool.solar && solar.armed()) solar.toggle();
         if(tool != Tool.battery && battery.armed()) battery.toggle();
         if(tool != Tool.wall && wall.armed()) wall.toggle();
         if(tool != Tool.mine && mine.armed()) mine.toggle();
         switch(tool){
             case drill -> drill.toggle();
+            case surge -> surge.toggle();
             case solar -> solar.toggle();
             case battery -> battery.toggle();
             case wall -> wall.toggle();

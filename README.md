@@ -5,6 +5,7 @@ One mod for **Mindustry Steam 160.7** with a compact **Pack** submenu. It combin
 | Tool | What it does |
 | --- | --- |
 | Auto-drill | Queues drills over an ore patch with a connected router border; defaults to pneumatic drills. |
+| Surge | Click a destination to queue side-connected Surge Towers, preferably beside black map terrain. |
 | Solar-pack | Packs 3×3 large solar panels in a dragged rectangle, then fills legal gaps with small batteries. |
 | Battery-pack | Packs 3×3 large batteries, then fills legal gaps with small batteries. |
 | Wall-pack | Packs 2×2 large walls of the selected material, then fills legal gaps with small walls. |
@@ -27,9 +28,10 @@ If building/installing locally on the above Steam macOS installation, `cd mindus
 
 ## Use
 
-Beside the bottom-right build menu, **Mega priority**, **Auto-drill**, and **Pack** are always visible (top to bottom). **Pack** is the bottom button and starts closed; click it to show **Wall**, **Battery**, **Solar**, and **Mine** in a single row to its left, and click again to hide them. The main buttons stay in place. An armed packing tool stays armed if Pack is closed; open Pack and select it again to cancel. Choosing another construction tool disarms the previous one.
+Beside the bottom-right build menu, **Mega priority**, **Auto-drill**, **Surge**, and **Pack** are always visible (top to bottom). **Pack** is the bottom button and starts closed; click it to show **Wall**, **Battery**, **Solar**, and **Mine** in a single row to its left, and click again to hide them. The main buttons stay in place. An armed packing tool stays armed if Pack is closed; open Pack and select it again to cancel. Choosing another construction tool disarms the previous one.
 
 * **Auto-drill:** Select a drill first (or use the unlocked pneumatic fallback), select Auto-drill, then click an ore patch.
+* **Surge:** Click Surge, then click a destination on the map. It routes from a reachable friendly Surge Tower, or falls back to a nearby friendly power node, solar panel, or battery.
 * **Solar / Battery / Wall / Mine:** Choose an option under Pack, then drag out a rectangular area. Mine queues Shock Mines; select a wall type first if you want a material other than copper.
 * **Mega priority:** Select friendly Megas in command mode and choose Mega priority. Choosing a vanilla command disables automation for those selected Megas. This opt-in resets when a new map loads.
 

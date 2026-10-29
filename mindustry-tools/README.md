@@ -1,6 +1,6 @@
 # Mindustry Tools
 
-One desktop mod combining Auto-drill, Solar-pack, Battery-pack, Wall-pack, Mine-pack, and Mega Priority for Mindustry Steam 160.7.
+One desktop mod combining Auto-drill, Surge routing, Solar-pack, Battery-pack, Wall-pack, Mine-pack, and Mega Priority for Mindustry Steam 160.7.
 
 ## Install
 
@@ -14,9 +14,10 @@ If building locally on that machine, `./install.sh` compiles, verifies the JAR, 
 
 ## Use
 
-**Mega priority**, **Auto-drill**, and **Pack** (top to bottom) are always visible just left of the build menu. **Pack** is the bottom button, the only submenu, and starts closed; click it to reveal **Wall**, **Battery**, **Solar**, and **Mine** in a single row to its left, aligned with Pack, without moving the main buttons. Click Pack again to close it. An active tool is highlighted. Choosing a different construction tool disarms the previous one. Closing Pack does not cancel an armed tool; reopen it and click that tool again to cancel.
+**Mega priority**, **Auto-drill**, **Surge**, and **Pack** (top to bottom) are always visible just left of the build menu. **Pack** is the bottom button, the only submenu, and starts closed; click it to reveal **Wall**, **Battery**, **Solar**, and **Mine** in a single row to its left, aligned with Pack, without moving the main buttons. Click Pack again to close it. An active tool is highlighted. Choosing a different construction tool disarms the previous one. Closing Pack does not cancel an armed tool; reopen it and click that tool again to cancel.
 
 * **Auto-drill:** Select a drill first (defaults to unlocked pneumatic drill), arm it, then click an ore patch. Queues drills plus a connected router border.
+* **Surge:** Click Surge and then a map destination. It searches up to 65 tiles from the click and queues a side-connected chain of 2×2 Surge Towers from the nearest reachable existing friendly Surge Tower; if none is reachable, it starts beside a friendly power node, solar panel, or battery. Valid placements beside black/static map terrain are preferred, not required. It never replaces buildings or queued plans, and allows removable map props. Power connection uses adjacency rather than explicitly configured laser links; it does not connect to other power-block types. Builders must still reach and construct the queued towers.
 * **Solar-pack:** Arm, then drag a rectangle. Queues large solar panels, filling remaining legal tiles with small batteries.
 * **Battery-pack:** Arm, then drag a rectangle. Queues large batteries, filling gaps with small batteries.
 * **Wall-pack:** Select either size of wall for the material (defaults to copper), arm, then drag a rectangle. Queues large walls followed by small-wall infill.
