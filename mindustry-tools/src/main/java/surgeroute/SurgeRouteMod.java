@@ -8,6 +8,7 @@ import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.entities.units.BuildPlan;
 import mindustry.game.EventType.ClientLoadEvent;
+import mindustry.game.EventType.WorldLoadEvent;
 import mindustry.game.EventType.Trigger;
 import mindustry.gen.Building;
 import mindustry.mod.Mod;
@@ -19,8 +20,10 @@ import java.util.*;
 
 /** Click destination; queue side-connected Surge Towers from existing power. */
 public class SurgeRouteMod extends Mod{
-    private static final int radius=65;
+    private static final int nodesPerFrame=1200;
     private boolean armed,hooksInstalled;
+    private SurgePlanner.Search search;
+    private Object searchWorld;
     private final InputProcessor clickHandler=new InputProcessor(){
         @Override public boolean touchDown(int sx,int sy,int pointer,KeyCode button){
             if(!armed || pointer!=0 || button!=KeyCode.mouseLeft || !ready() ||
@@ -37,12 +40,14 @@ public class SurgeRouteMod extends Mod{
             hooksInstalled=true;
             Core.input.getInputProcessors().insert(0,clickHandler);
         });
-        Events.run(Trigger.update,() -> {if(armed && !ready()) armed=false;});
+        Events.on(WorldLoadEvent.class,event -> {armed=false;search=null;searchWorld=null;});
+        Events.run(Trigger.update,this::update);
     }
     public boolean armed(){return armed;}
     public void toggle(){
         if(!ready()) return;
         if(armed){armed=false;return;}
+        if(search!=null){search=null;searchWorld=null;return;}
         if(!Blocks.surgeTower.unlockedNow() || !Blocks.surgeTower.isPlaceable()){
             toast("Unlock Surge Towers first.");return;
         }
@@ -55,6 +60,25 @@ public class SurgeRouteMod extends Mod{
     }
     private void toast(String message){
         if(Vars.ui!=null && Vars.ui.hudfrag!=null) Vars.ui.hudfrag.showToast(message);
+    }
+    private void update(){
+        if(!ready()){
+            armed=false;search=null;searchWorld=null;
+            return;
+        }
+        if(search==null) return;
+        if(searchWorld!=Vars.world){search=null;searchWorld=null;return;}
+        if(search.advance(nodesPerFrame)){
+            SurgePlanner.Route route=search.result();
+            search=null;searchWorld=null;
+            if(route==null){toast("No placeable Surge Tower route to the selected point.");return;}
+            Block tower=Blocks.surgeTower;
+            for(SurgePlanner.Point p:route.towers()){
+                BuildPlan plan=new BuildPlan(p.x(),p.y(),0,tower);
+                tower.onNewPlan(plan);
+                Vars.player.unit().addBuild(plan);
+            }
+        }
     }
     private void queueTo(int x,int y){
         Block tower=Blocks.surgeTower;
@@ -69,7 +93,7 @@ public class SurgeRouteMod extends Mod{
         List<SurgePlanner.Source> existing=new ArrayList<>(), fallback=new ArrayList<>();
         for(Building build:Vars.player.team().data().buildings){
             if(build==null || !build.isValid() || build.team()!=Vars.player.team() ||
-                Math.abs(build.tileX()-x)>radius+4 || Math.abs(build.tileY()-y)>radius+4) continue;
+                build.power==null) continue;
             SurgePlanner.Source source=new SurgePlanner.Source(new SurgePlanner.Point(build.tileX(),build.tileY()),build.block.size);
             if(build.block==tower) existing.add(source);
             else if(isFallback(build.block)) fallback.add(source);
@@ -78,7 +102,8 @@ public class SurgeRouteMod extends Mod{
             toast("No friendly Surge Tower, power node, solar panel or battery to connect to.");return;
         }
         SurgePlanner.Grid grid=new SurgePlanner.Grid(){
-            public boolean inBounds(int tx,int ty){return Vars.world.tile(tx,ty)!=null;}
+            public int width(){return Vars.world.width();}
+            public int height(){return Vars.world.height();}
             public boolean validTower(int tx,int ty){
                 if(!Build.validPlace(tower,Vars.player.team(),tx,ty,0)) return false;
                 for(int dx=0;dx<tower.size;dx++)for(int dy=0;dy<tower.size;dy++){
@@ -103,13 +128,8 @@ public class SurgeRouteMod extends Mod{
                 return score;
             }
         };
-        SurgePlanner.Route route=SurgePlanner.plan(grid,new SurgePlanner.Point(x,y),existing,fallback,radius);
-        if(route==null){toast("No placeable Surge Tower route to the selected point.");return;}
-        for(SurgePlanner.Point p:route.towers()){
-            BuildPlan plan=new BuildPlan(p.x(),p.y(),0,tower);
-            tower.onNewPlan(plan);
-            Vars.player.unit().addBuild(plan);
-        }
+        search=new SurgePlanner.Search(grid,new SurgePlanner.Point(x,y),existing,fallback);
+        searchWorld=Vars.world;
     }
     private static boolean isFallback(Block block){
         return block==Blocks.powerNode || block==Blocks.powerNodeLarge ||
