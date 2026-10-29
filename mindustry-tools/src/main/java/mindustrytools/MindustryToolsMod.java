@@ -47,7 +47,7 @@ public class MindustryToolsMod extends Mod{
                     option(options, "Surge", surge::armed, () -> select(Tool.surge));
                     options.row();
                     option(options, "Pack", () -> packOpen, () -> packOpen = !packOpen);
-                }).padRight(316f).padBottom(6f);
+                }).padRight(404f).padBottom(6f);
             });
             // Independent bottom-right overlay: parent buttons stay fixed
             // while four pack buttons appear in a row to Pack's left.
@@ -62,7 +62,7 @@ public class MindustryToolsMod extends Mod{
                     option(packs, "Battery", battery::armed, () -> select(Tool.battery));
                     option(packs, "Solar", solar::armed, () -> select(Tool.solar));
                     option(packs, "Mine", mine::armed, () -> select(Tool.mine));
-                }).padRight(497f).padBottom(6f);
+                }).padRight(585f).padBottom(6f);
             });
         });
     }
