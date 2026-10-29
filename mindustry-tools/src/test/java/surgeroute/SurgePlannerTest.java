@@ -67,6 +67,16 @@ public class SurgePlannerTest{
             "wall-hugging route must be selected when a longer detour exists");
         check(detoured.towers().size()>straight.towers().size(),
             "wall preference must beat a shorter open-field route");
+        // Perpendicular branch: wall preference behind the existing chain
+        // must not put a stray first tower on the opposite side.
+        Grid perpendicular=new Grid(260,260){
+            @Override public int wallEdges(int x,int y){return y>=95 && y<=97 ? 2 : 0;}
+        };
+        var branch=plan(perpendicular,new SurgePlanner.Point(100,220),
+            List.of(new SurgePlanner.Source(new SurgePlanner.Point(100,100),2)),List.of(),10);
+        verify(branch,perpendicular);
+        check(branch.towers().get(0).y()>100,
+            "branch should attach on destination-facing side, not behind source: "+branch.towers());
         Grid blockedLinks=new Grid(120,60){
             @Override public boolean linkClear(int x,int y,int x2,int y2){
                 return !(y==20 && y2==20 && Math.abs(x-x2)>10);

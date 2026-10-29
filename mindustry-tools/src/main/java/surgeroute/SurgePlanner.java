@@ -38,6 +38,7 @@ public final class SurgePlanner{
         private Route fallback,result,bestTower;
         private long bestSourceDistance=Long.MAX_VALUE;
         private int bestSourceCost=Integer.MAX_VALUE;
+        private long bestAttachmentDistance=Long.MAX_VALUE;
         private int bestFallbackCount=Integer.MAX_VALUE;
         private long bestFallbackGap=-1;
         private boolean finished;
@@ -85,8 +86,15 @@ public final class SurgePlanner{
                 if(towerSource!=null){
                     Route candidate=new Route(backtrack(index),towerSource,true);
                     long distance=distanceSquared(towerSource.center,destination);
-                    if(distance<bestSourceDistance || distance==bestSourceDistance && node.cost<bestSourceCost){
+                    long attachment=distanceSquared(current,destination);
+                    // After choosing the nearest reachable source, connect
+                    // on its destination-facing side when possible. A wall
+                    // bonus must not place a stray tower behind that source.
+                    if(distance<bestSourceDistance || distance==bestSourceDistance &&
+                        (attachment<bestAttachmentDistance ||
+                            attachment==bestAttachmentDistance && node.cost<bestSourceCost)){
                         bestSourceDistance=distance;
+                        bestAttachmentDistance=attachment;
                         bestSourceCost=node.cost;
                         bestTower=candidate;
                     }
