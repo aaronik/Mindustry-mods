@@ -18,12 +18,19 @@ import mindustry.world.Tile;
 
 import java.util.*;
 
-/** Click destination; queue side-connected Surge Towers from existing power. */
+/** Click destination; queue laser-linked Surge Towers from existing power. */
 public class SurgeRouteMod extends Mod{
     private static final int nodesPerFrame=1200;
     private boolean armed,hooksInstalled;
     private SurgePlanner.Search search;
     private Object searchWorld;
+    private final List<Link> pendingLinks=new ArrayList<>();
+    private long lastReconcile;
+    private static final class Link{
+        final SurgePlanner.Point from,to;
+        long lastRequest;
+        Link(SurgePlanner.Point from,SurgePlanner.Point to){this.from=from;this.to=to;}
+    }
     private final InputProcessor clickHandler=new InputProcessor(){
         @Override public boolean touchDown(int sx,int sy,int pointer,KeyCode button){
             if(!armed || pointer!=0 || button!=KeyCode.mouseLeft || !ready() ||
@@ -40,7 +47,7 @@ public class SurgeRouteMod extends Mod{
             hooksInstalled=true;
             Core.input.getInputProcessors().insert(0,clickHandler);
         });
-        Events.on(WorldLoadEvent.class,event -> {armed=false;search=null;searchWorld=null;});
+        Events.on(WorldLoadEvent.class,event -> {armed=false;search=null;searchWorld=null;pendingLinks.clear();});
         Events.run(Trigger.update,this::update);
     }
     public boolean armed(){return armed;}
@@ -66,17 +73,52 @@ public class SurgeRouteMod extends Mod{
             armed=false;search=null;searchWorld=null;
             return;
         }
-        if(search==null) return;
+        if(search==null){
+            if(!pendingLinks.isEmpty() && arc.util.Time.timeSinceMillis(lastReconcile)>450L){
+                lastReconcile=arc.util.Time.millis();
+                reconcileLinks();
+            }
+            return;
+        }
         if(searchWorld!=Vars.world){search=null;searchWorld=null;return;}
         if(search.advance(nodesPerFrame)){
             SurgePlanner.Route route=search.result();
             search=null;searchWorld=null;
             if(route==null){toast("No placeable Surge Tower route to the selected point.");return;}
             Block tower=Blocks.surgeTower;
-            for(SurgePlanner.Point p:route.towers()){
+            for(int i=0;i<route.towers().size();i++){
+                SurgePlanner.Point p=route.towers().get(i);
+                SurgePlanner.Point target=i==0 ? route.source().center() : route.towers().get(i-1);
+                // Reconcile links when both endpoint buildings exist; vanilla
+                // builders may construct queued plans out of order.
                 BuildPlan plan=new BuildPlan(p.x(),p.y(),0,tower);
+                pendingLinks.add(new Link(p,target));
                 tower.onNewPlan(plan);
                 Vars.player.unit().addBuild(plan);
+            }
+        }
+    }
+    private void reconcileLinks(){
+        var iter=pendingLinks.iterator();
+        while(iter.hasNext()){
+            Link link=iter.next();
+            Building from=Vars.world.build(link.from.x(),link.from.y());
+            Building to=Vars.world.build(link.to.x(),link.to.y());
+            if(from==null || to==null || from.block!=Blocks.surgeTower ||
+                from.power==null || to.power==null || from.team()!=Vars.player.team() ||
+                to.team()!=Vars.player.team()) continue;
+            if(from.power.links.contains(to.pos())){iter.remove();continue;}
+            if(from.power.links.size>=2){
+                // Do not disturb existing connections; leave the route link
+                // pending rather than toggling a different neighbor off.
+                continue;
+            }
+            if(Blocks.surgeTower instanceof mindustry.world.blocks.power.PowerNode node &&
+                node.linkValid(from,to) &&
+                !mindustry.world.blocks.power.PowerNode.insulated(from,to) &&
+                arc.util.Time.timeSinceMillis(link.lastRequest)>2000L){
+                from.configure(to.pos());
+                link.lastRequest=arc.util.Time.millis();
             }
         }
     }
@@ -95,8 +137,10 @@ public class SurgeRouteMod extends Mod{
             if(build==null || !build.isValid() || build.team()!=Vars.player.team() ||
                 build.power==null) continue;
             SurgePlanner.Source source=new SurgePlanner.Source(new SurgePlanner.Point(build.tileX(),build.tileY()),build.block.size);
-            if(build.block==tower) existing.add(source);
-            else if(isFallback(build.block)) fallback.add(source);
+            if(build.block==tower && build.power.links.size < 2) existing.add(source);
+            else if(isFallback(build.block) &&
+                (!(build.block instanceof mindustry.world.blocks.power.PowerNode node) ||
+                    build.power.links.size < node.maxNodes)) fallback.add(source);
         }
         if(existing.isEmpty() && fallback.isEmpty()){
             toast("No friendly Surge Tower, power node, solar panel or battery to connect to.");return;
@@ -104,6 +148,9 @@ public class SurgeRouteMod extends Mod{
         SurgePlanner.Grid grid=new SurgePlanner.Grid(){
             public int width(){return Vars.world.width();}
             public int height(){return Vars.world.height();}
+            public boolean linkClear(int x1,int y1,int x2,int y2){
+                return !mindustry.world.blocks.power.PowerNode.insulated(x1,y1,x2,y2);
+            }
             public boolean validTower(int tx,int ty){
                 if(!Build.validPlace(tower,Vars.player.team(),tx,ty,0)) return false;
                 for(int dx=0;dx<tower.size;dx++)for(int dy=0;dy<tower.size;dy++){

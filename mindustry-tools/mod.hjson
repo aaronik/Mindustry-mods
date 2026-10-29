@@ -3,6 +3,6 @@ displayName: Mindustry Tools
 author: Aaron
 main: mindustrytools.MindustryToolsMod
 description: Auto-drill, Surge routing, packing tools, and Mega Priority.
-version: 1.7.1
+version: 1.7.2
 minGameVersion: 160.7
 hidden: true

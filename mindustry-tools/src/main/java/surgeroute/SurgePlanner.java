@@ -2,7 +2,7 @@ package surgeroute;
 
 import java.util.*;
 
-/** Resumable side-connected 2x2 pathfinder; lower costs favor map-wall edges. */
+/** Resumable laser-hop pathfinder; long hops and map-wall edges are preferred. */
 public final class SurgePlanner{
     private SurgePlanner(){}
     public record Point(int x,int y){}
@@ -11,18 +11,26 @@ public final class SurgePlanner{
         int width();
         int height();
         boolean validTower(int x,int y);
+        boolean linkClear(int x,int y,int x2,int y2);
         /** Number of black/static map-wall tiles beside the tower footprint. */
         int wallEdges(int x,int y);
     }
     public record Route(List<Point> towers,Source source,boolean usedExistingTower){}
     private record Node(int index,int cost){}
-    private static final int[][] directions={{1,0},{-1,0},{0,1},{0,-1}};
+    // 38 tiles is a conservative margin below the vanilla 40-tile range.
+    public static final int maxHop=38;
+    private static final int[] strides={38,34,30,26,22,18,14,10,6};
+    private static final int[][] directions={{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
+    public static boolean inRange(Point a,Point b){
+        long dx=(long)a.x-b.x,dy=(long)a.y-b.y;
+        return dx*dx+dy*dy <= (long)maxHop*maxHop;
+    }
 
     /** Search for a Surge source first; only fall back if none is reachable. */
     public static final class Search{
         private final Grid grid;
         private final int width,height;
-        private final Map<Point,List<Source>> towerGoals,fallbackGoals;
+        private final Map<Long,List<Source>> towerGoals,fallbackGoals;
         private final PriorityQueue<Node> frontier=new PriorityQueue<>(Comparator.comparingInt(Node::cost));
         private final int[] costs,parents;
         private final byte[] valid;
@@ -41,8 +49,8 @@ public final class SurgePlanner{
             valid=new byte[(int)area];
             Arrays.fill(costs,Integer.MAX_VALUE);
             Arrays.fill(parents,-1);
-            towerGoals=goals(towers,width,height);
-            fallbackGoals=goals(fallbackSources,width,height);
+            towerGoals=goals(towers);
+            fallbackGoals=goals(fallbackSources);
             if(towerGoals.isEmpty() && fallbackGoals.isEmpty()){finished=true;return;}
             for(int x=destination.x-2;x<=destination.x+2;x++){
                 for(int y=destination.y-2;y<=destination.y+2;y++){
@@ -50,7 +58,7 @@ public final class SurgePlanner{
                     int index=idx(x,y);
                     int distance=Math.abs(x-destination.x)+Math.abs(y-destination.y);
                     int edge=Math.min(4,Math.max(0,grid.wallEdges(x,y)));
-                    int cost=100+distance*6-edge*10;
+                    int cost=1000+distance*6-edge*20;
                     if(cost>=costs[index]) continue;
                     costs[index]=cost;
                     frontier.add(new Node(index,cost));
@@ -67,22 +75,28 @@ public final class SurgePlanner{
                 if(node.cost!=costs[index]) continue;
                 int x=index%width,y=index/width;
                 Point current=new Point(x,y);
-                List<Source> towerSources=towerGoals.get(current);
-                if(towerSources!=null){
-                    result=new Route(backtrack(index),towerSources.get(0),true);
+                Source towerSource=findSource(towerGoals,current,grid);
+                if(towerSource!=null){
+                    result=new Route(backtrack(index),towerSource,true);
                     finished=true;
                     return true;
                 }
-                List<Source> otherSources=fallbackGoals.get(current);
-                if(fallback==null && otherSources!=null){
-                    fallback=new Route(backtrack(index),otherSources.get(0),false);
+                Source otherSource=findSource(fallbackGoals,current,grid);
+                if(fallback==null && otherSource!=null){
+                    fallback=new Route(backtrack(index),otherSource,false);
                 }
-                for(int[] dir:directions){
-                    int nx=x+dir[0]*2,ny=y+dir[1]*2;
-                    if(!legal(nx,ny)) continue;
+                for(int[] dir:directions) for(int stride:strides){
+                    // Diagonal hops have shorter per-axis strides so their
+                    // Euclidean distance stays below the 38-tile safety range.
+                    int step=(dir[0]!=0 && dir[1]!=0 && stride>26) ? stride*7/10 : stride;
+                    int nx=x+dir[0]*step,ny=y+dir[1]*step;
+                    if(!legal(nx,ny) || !inRange(current,new Point(nx,ny)) ||
+                        !grid.linkClear(x,y,nx,ny)) continue;
                     int next=idx(nx,ny);
                     int edge=Math.min(4,Math.max(0,grid.wallEdges(nx,ny)));
-                    int cost=node.cost+100-edge*10;
+                    // Tower count dominates: short hops pay a modest penalty;
+                    // terrain edges offer a soft preference, not a requirement.
+                    int cost=node.cost+1000-edge*20+(maxHop-(int)Math.hypot(nx-x,ny-y))*3;
                     if(cost>=costs[next]) continue;
                     costs[next]=cost;
                     parents[next]=index;
@@ -115,32 +129,34 @@ public final class SurgePlanner{
         }
     }
 
-    private static Map<Point,List<Source>> goals(List<Source> sources,int width,int height){
-        Map<Point,List<Source>> result=new HashMap<>();
+    private static long key(int x,int y){return ((long)(x>>6)<<32) ^ ((y>>6)&0xffffffffL);}
+    private static Map<Long,List<Source>> goals(List<Source> sources){
+        Map<Long,List<Source>> buckets=new HashMap<>();
         for(Source source:sources){
-            int bx=source.center.x-((source.size-1)/2);
-            int by=source.center.y-((source.size-1)/2);
-            // Candidate 2x2 tower anchors that touch any edge of this source.
-            for(int x=bx-2;x<=bx+source.size;x++){
-                for(int y=by-2;y<=by+source.size;y++){
-                    if(x<0 || y<0 || x>=width || y>=height) continue;
-                    Point candidate=new Point(x,y);
-                    if(touches(candidate,2,source.center,source.size)){
-                        result.computeIfAbsent(candidate,key->new ArrayList<>()).add(source);
-                    }
+            // A source near a bucket boundary can link to a candidate in any
+            // neighboring bucket. Add it to all buckets intersecting its reach.
+            for(int bx=(source.center.x-maxHop-4)>>6;bx<=((source.center.x+maxHop+4)>>6);bx++){
+                for(int by=(source.center.y-maxHop-4)>>6;by<=((source.center.y+maxHop+4)>>6);by++){
+                    buckets.computeIfAbsent(((long)bx<<32) ^ (by&0xffffffffL),k->new ArrayList<>()).add(source);
                 }
             }
         }
-        return result;
+        return buckets;
     }
-
-    /** True only if footprints share a side, not just a corner. */
-    public static boolean touches(Point a,int as,Point b,int bs){
-        int ax=a.x-((as-1)/2),ay=a.y-((as-1)/2);
-        int bx=b.x-((bs-1)/2),by=b.y-((bs-1)/2);
-        boolean xOverlap=ax<bx+bs && bx<ax+as;
-        boolean yOverlap=ay<by+bs && by<ay+as;
-        return (ax+as==bx || bx+bs==ax) && yOverlap ||
-            (ay+as==by || by+bs==ay) && xOverlap;
+    // Size of source is accounted for by the game's actual laser radius when
+    // configured; use a conservative center-to-center threshold for planning.
+    private static Source findSource(Map<Long,List<Source>> buckets,Point candidate,Grid grid){
+        List<Source> sources=buckets.get(key(candidate.x,candidate.y));
+        if(sources==null) return null;
+        Source best=null;
+        long distance=Long.MAX_VALUE;
+        for(Source source:sources){
+            long dx=(long)candidate.x-source.center.x,dy=(long)candidate.y-source.center.y;
+            long d=dx*dx+dy*dy;
+            if(d>=(long)maxHop*maxHop || d>=distance ||
+                !grid.linkClear(candidate.x,candidate.y,source.center.x,source.center.y)) continue;
+            best=source;distance=d;
+        }
+        return best;
     }
 }

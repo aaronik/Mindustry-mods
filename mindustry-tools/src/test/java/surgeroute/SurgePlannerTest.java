@@ -7,6 +7,7 @@ public class SurgePlannerTest{
         Set<SurgePlanner.Point> blocked=new HashSet<>(), wallAdjacent=new HashSet<>();
         Grid(int width,int height){this.width=width;this.height=height;}
         public int width(){return width;}
+        public boolean linkClear(int x,int y,int x2,int y2){return true;}
         public int height(){return height;}
         public boolean validTower(int x,int y){
             return x>=0 && y>=0 && x+1<width && y+1<height && !blocked.contains(new SurgePlanner.Point(x,y));
@@ -25,11 +26,11 @@ public class SurgePlannerTest{
     static void verify(SurgePlanner.Route route,Grid grid){
         check(route!=null && !route.towers().isEmpty(),"route must queue at least one tower");
         var src=route.source();
-        check(SurgePlanner.touches(route.towers().get(0),2,src.center(),src.size()),"first tower must side-touch source");
+        check(SurgePlanner.inRange(route.towers().get(0),src.center()),"first tower must link to source in range");
         for(int i=0;i<route.towers().size();i++){
             var p=route.towers().get(i);
             check(grid.validTower(p.x(),p.y()),"route must use valid placements");
-            if(i>0)check(SurgePlanner.touches(route.towers().get(i-1),2,p,2),"route must side-connect");
+            if(i>0)check(SurgePlanner.inRange(route.towers().get(i-1),p),"route must be within laser range");
         }
     }
     public static void main(String[] args){
@@ -42,29 +43,39 @@ public class SurgePlannerTest{
         check(route!=null && route.usedExistingTower(),"prefer reachable Surge Towers");
         check(route.source().equals(near),"choose nearest reachable Surge chain");
         verify(route,g);
-        check(!SurgePlanner.touches(new SurgePlanner.Point(0,0),2,new SurgePlanner.Point(2,2),2),"diagonal corners do not connect");
-        check(SurgePlanner.touches(new SurgePlanner.Point(0,0),2,new SurgePlanner.Point(2,0),2),"edge-connected towers connect");
-        check(SurgePlanner.touches(new SurgePlanner.Point(0,0),2,new SurgePlanner.Point(3,0),3),"tower can touch 3x3 battery");
+        check(!SurgePlanner.inRange(new SurgePlanner.Point(0,0),new SurgePlanner.Point(40,0)),"40 tiles is outside conservative hop range");
         Grid walled=new Grid(45,45);
         for(int x=4;x<=22;x+=2) walled.wallAdjacent.add(new SurgePlanner.Point(x,8));
         var wallRoute=plan(walled,new SurgePlanner.Point(22,10),List.of(new SurgePlanner.Source(new SurgePlanner.Point(2,10),2)),List.of(),9);
         verify(wallRoute,walled);
         check(wallRoute.towers().stream().anyMatch(p->p.y()==8),"favor wall edge on comparable routes");
+        Grid blockedLinks=new Grid(120,60){
+            @Override public boolean linkClear(int x,int y,int x2,int y2){
+                return !(y==20 && y2==20 && Math.abs(x-x2)>10);
+            }
+        };
+        var detour=plan(blockedLinks,new SurgePlanner.Point(106,20),
+            List.of(new SurgePlanner.Source(new SurgePlanner.Point(5,20),2)),List.of(),12);
+        verify(detour,blockedLinks);
+        check(detour.towers().stream().anyMatch(p->p.y()!=20),"insulated straight hop should be detoured");
         var fallback=plan(g,dst,List.of(),List.of(power),7);
         check(fallback!=null && !fallback.usedExistingTower(),"fallback to power structure");
         verify(fallback,g);
         var battery=new SurgePlanner.Source(new SurgePlanner.Point(16,10),3);
         verify(plan(g,dst,List.of(),List.of(battery),3),g);
-        Grid enclosed=new Grid(45,45);
-        for(int x=0;x<14;x++)for(int y=0;y<45;y++) enclosed.blocked.add(new SurgePlanner.Point(x,y));
+        Grid enclosed=new Grid(45,45){
+            @Override public boolean linkClear(int x,int y,int x2,int y2){
+                return !(x2==far.center().x() && y2==far.center().y());
+            }
+        };
         check(plan(enclosed,dst,List.of(far),List.of(power),5).source().equals(power),"unreachable Surge chain falls back to power");
         check(plan(g,dst,List.of(),List.of(),10)==null,"no power source fails safely");
-        // Beyond former 65-tile limit: a long, side-connected chain.
+        // Beyond former 65-tile limit: long-range hops need only ~53 towers.
         Grid huge=new Grid(2200,5);
         var longRoute=plan(huge,new SurgePlanner.Point(2010,1),
             List.of(new SurgePlanner.Source(new SurgePlanner.Point(2,1),2)),List.of(),120);
         verify(longRoute,huge);
-        check(longRoute.towers().size()>900,"thousands-tile route must be supported");
+        check(longRoute.towers().size()<90,"long-range transmission should use dozens, not hundreds, of towers");
         System.out.println("Surge route tests passed: "+longRoute.towers().size()+" towers across >2000 tiles");
     }
 }
