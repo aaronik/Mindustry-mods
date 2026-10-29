@@ -58,7 +58,7 @@ public final class SurgePlanner{
                     int index=idx(x,y);
                     int distance=Math.abs(x-destination.x)+Math.abs(y-destination.y);
                     int edge=Math.min(4,Math.max(0,grid.wallEdges(x,y)));
-                    int cost=1000+distance*6-edge*20;
+                    int cost=(edge>0 ? 150 : 1000)+distance*6;
                     if(cost>=costs[index]) continue;
                     costs[index]=cost;
                     frontier.add(new Node(index,cost));
@@ -94,9 +94,11 @@ public final class SurgePlanner{
                         !grid.linkClear(x,y,nx,ny)) continue;
                     int next=idx(nx,ny);
                     int edge=Math.min(4,Math.max(0,grid.wallEdges(nx,ny)));
-                    // Tower count dominates: short hops pay a modest penalty;
-                    // terrain edges offer a soft preference, not a requirement.
-                    int cost=node.cost+1000-edge*20+(maxHop-(int)Math.hypot(nx-x,ny-y))*3;
+                    // A wall-hugging tower is much cheaper than an open-field
+                    // one. Detours that keep towers beside map walls can win
+                    // over a shorter route crossing open buildable space.
+                    int cost=node.cost+(edge>0 ? 150 : 1000)+
+                        (maxHop-(int)Math.hypot(nx-x,ny-y))*2;
                     if(cost>=costs[next]) continue;
                     costs[next]=cost;
                     parents[next]=index;

@@ -49,6 +49,18 @@ public class SurgePlannerTest{
         var wallRoute=plan(walled,new SurgePlanner.Point(22,10),List.of(new SurgePlanner.Source(new SurgePlanner.Point(2,10),2)),List.of(),9);
         verify(wallRoute,walled);
         check(wallRoute.towers().stream().anyMatch(p->p.y()==8),"favor wall edge on comparable routes");
+        Grid wallDetour=new Grid(320,320){
+            @Override public int wallEdges(int x,int y){return y>=96 && y<=104 ? 2 : 0;}
+        };
+        Grid openField=new Grid(320,320);
+        var detoured=plan(wallDetour,new SurgePlanner.Point(260,150),
+            List.of(new SurgePlanner.Source(new SurgePlanner.Point(20,150),2)),List.of(),100);
+        var straight=plan(openField,new SurgePlanner.Point(260,150),
+            List.of(new SurgePlanner.Source(new SurgePlanner.Point(20,150),2)),List.of(),100);
+        check(detoured.towers().stream().anyMatch(p->p.y()>=96 && p.y()<=104),
+            "wall-hugging route must be selected when a longer detour exists");
+        check(detoured.towers().size()>straight.towers().size(),
+            "wall preference must beat a shorter open-field route");
         Grid blockedLinks=new Grid(120,60){
             @Override public boolean linkClear(int x,int y,int x2,int y2){
                 return !(y==20 && y2==20 && Math.abs(x-x2)>10);
