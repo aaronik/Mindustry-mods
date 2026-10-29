@@ -92,7 +92,11 @@ public class SurgeRouteMod extends Mod{
                 // Reconcile links when both endpoint buildings exist; vanilla
                 // builders may construct queued plans out of order.
                 BuildPlan plan=new BuildPlan(p.x(),p.y(),0,tower);
-                pendingLinks.add(new Link(p,target));
+                if(i>0 || !route.usedExistingTower()){
+                    // Adjacent Surge Towers conduct even when both laser slots
+                    // are full, so no explicit first link is required.
+                    pendingLinks.add(new Link(p,target));
+                }
                 tower.onNewPlan(plan);
                 Vars.player.unit().addBuild(plan);
             }
@@ -137,7 +141,7 @@ public class SurgeRouteMod extends Mod{
             if(build==null || !build.isValid() || build.team()!=Vars.player.team() ||
                 build.power==null) continue;
             SurgePlanner.Source source=new SurgePlanner.Source(new SurgePlanner.Point(build.tileX(),build.tileY()),build.block.size);
-            if(build.block==tower && build.power.links.size < 2) existing.add(source);
+            if(build.block==tower) existing.add(source);
             else if(isFallback(build.block) &&
                 (!(build.block instanceof mindustry.world.blocks.power.PowerNode node) ||
                     build.power.links.size < node.maxNodes)) fallback.add(source);

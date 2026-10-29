@@ -26,7 +26,13 @@ public class SurgePlannerTest{
     static void verify(SurgePlanner.Route route,Grid grid){
         check(route!=null && !route.towers().isEmpty(),"route must queue at least one tower");
         var src=route.source();
-        check(SurgePlanner.inRange(route.towers().get(0),src.center()),"first tower must link to source in range");
+        if(route.usedExistingTower()){
+            check(SurgePlanner.touches(route.towers().get(0),2,src.center(),src.size()),
+                "first tower must side-touch existing Surge Tower");
+        }else{
+            check(SurgePlanner.inRange(route.towers().get(0),src.center()),
+                "first tower must laser-link to other power source in range");
+        }
         for(int i=0;i<route.towers().size();i++){
             var p=route.towers().get(i);
             check(grid.validTower(p.x(),p.y()),"route must use valid placements");
@@ -70,6 +76,17 @@ public class SurgePlannerTest{
             List.of(new SurgePlanner.Source(new SurgePlanner.Point(5,20),2)),List.of(),12);
         verify(detour,blockedLinks);
         check(detour.towers().stream().anyMatch(p->p.y()!=20),"insulated straight hop should be detoured");
+        Grid fallbackRange=new Grid(140,12);
+        var distantPower=new SurgePlanner.Source(new SurgePlanner.Point(4,5),1);
+        var remote=plan(fallbackRange,new SurgePlanner.Point(98,5),List.of(),List.of(distantPower),10);
+        verify(remote,fallbackRange);
+        int firstGap=Math.abs(remote.towers().get(0).x()-distantPower.center().x());
+        check(firstGap>=30 && firstGap<SurgePlanner.maxHop,
+            "fallback first tower should use a long-range link, got "+firstGap);
+        check(SurgePlanner.touches(new SurgePlanner.Point(0,0),2,new SurgePlanner.Point(2,0),2),
+            "side-touching towers connect without a laser link");
+        check(!SurgePlanner.touches(new SurgePlanner.Point(0,0),2,new SurgePlanner.Point(2,2),2),
+            "diagonal corners cannot connect as Surge sources");
         var fallback=plan(g,dst,List.of(),List.of(power),7);
         check(fallback!=null && !fallback.usedExistingTower(),"fallback to power structure");
         verify(fallback,g);

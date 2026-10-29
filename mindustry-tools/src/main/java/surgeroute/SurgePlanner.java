@@ -19,7 +19,7 @@ public final class SurgePlanner{
     private record Node(int index,int cost){}
     // 38 tiles is a conservative margin below the vanilla 40-tile range.
     public static final int maxHop=38;
-    private static final int[] strides={38,34,30,26,22,18,14,10,6};
+    private static final int[] strides={38,37,34,33,30,29,26,25,22,21,18,17,14,13,10,9,6,5,3,2};
     private static final int[][] directions={{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
     public static boolean inRange(Point a,Point b){
         long dx=(long)a.x-b.x,dy=(long)a.y-b.y;
@@ -29,16 +29,22 @@ public final class SurgePlanner{
     /** Search for a Surge source first; only fall back if none is reachable. */
     public static final class Search{
         private final Grid grid;
+        private final Point destination;
         private final int width,height;
         private final Map<Long,List<Source>> towerGoals,fallbackGoals;
         private final PriorityQueue<Node> frontier=new PriorityQueue<>(Comparator.comparingInt(Node::cost));
         private final int[] costs,parents;
         private final byte[] valid;
-        private Route fallback,result;
+        private Route fallback,result,bestTower;
+        private long bestSourceDistance=Long.MAX_VALUE;
+        private int bestSourceCost=Integer.MAX_VALUE;
+        private int bestFallbackCount=Integer.MAX_VALUE;
+        private long bestFallbackGap=-1;
         private boolean finished;
 
         public Search(Grid grid,Point destination,List<Source> towers,List<Source> fallbackSources){
             this.grid=grid;
+            this.destination=destination;
             width=grid.width();height=grid.height();
             long area=(long)width*height;
             if(width<1 || height<1 || area>12_000_000L){
@@ -49,8 +55,8 @@ public final class SurgePlanner{
             valid=new byte[(int)area];
             Arrays.fill(costs,Integer.MAX_VALUE);
             Arrays.fill(parents,-1);
-            towerGoals=goals(towers);
-            fallbackGoals=goals(fallbackSources);
+            towerGoals=goals(towers,true);
+            fallbackGoals=goals(fallbackSources,false);
             if(towerGoals.isEmpty() && fallbackGoals.isEmpty()){finished=true;return;}
             for(int x=destination.x-2;x<=destination.x+2;x++){
                 for(int y=destination.y-2;y<=destination.y+2;y++){
@@ -75,15 +81,27 @@ public final class SurgePlanner{
                 if(node.cost!=costs[index]) continue;
                 int x=index%width,y=index/width;
                 Point current=new Point(x,y);
-                Source towerSource=findSource(towerGoals,current,grid);
+                Source towerSource=findSource(towerGoals,current,grid,true);
                 if(towerSource!=null){
-                    result=new Route(backtrack(index),towerSource,true);
-                    finished=true;
-                    return true;
+                    Route candidate=new Route(backtrack(index),towerSource,true);
+                    long distance=distanceSquared(towerSource.center,destination);
+                    if(distance<bestSourceDistance || distance==bestSourceDistance && node.cost<bestSourceCost){
+                        bestSourceDistance=distance;
+                        bestSourceCost=node.cost;
+                        bestTower=candidate;
+                    }
                 }
-                Source otherSource=findSource(fallbackGoals,current,grid);
-                if(fallback==null && otherSource!=null){
-                    fallback=new Route(backtrack(index),otherSource,false);
+                Source otherSource=findSource(fallbackGoals,current,grid,false);
+                if(otherSource!=null){
+                    List<Point> path=backtrack(index);
+                    Point first=path.get(0);
+                    long gap=distanceSquared(first,otherSource.center);
+                    if(path.size()<bestFallbackCount ||
+                        path.size()==bestFallbackCount && gap>bestFallbackGap){
+                        fallback=new Route(path,otherSource,false);
+                        bestFallbackCount=path.size();
+                        bestFallbackGap=gap;
+                    }
                 }
                 for(int[] dir:directions) for(int stride:strides){
                     // Diagonal hops have shorter per-axis strides so their
@@ -106,7 +124,7 @@ public final class SurgePlanner{
                 }
             }
             if(frontier.isEmpty()){
-                result=fallback;
+                result=bestTower!=null ? bestTower : fallback;
                 finished=true;
             }
             return finished;
@@ -131,23 +149,36 @@ public final class SurgePlanner{
         }
     }
 
+    private static long distanceSquared(Point a,Point b){
+        long dx=(long)a.x-b.x,dy=(long)a.y-b.y;
+        return dx*dx+dy*dy;
+    }
     private static long key(int x,int y){return ((long)(x>>6)<<32) ^ ((y>>6)&0xffffffffL);}
-    private static Map<Long,List<Source>> goals(List<Source> sources){
+    private static Map<Long,List<Source>> goals(List<Source> sources,boolean touching){
         Map<Long,List<Source>> buckets=new HashMap<>();
         for(Source source:sources){
-            // A source near a bucket boundary can link to a candidate in any
-            // neighboring bucket. Add it to all buckets intersecting its reach.
-            for(int bx=(source.center.x-maxHop-4)>>6;bx<=((source.center.x+maxHop+4)>>6);bx++){
-                for(int by=(source.center.y-maxHop-4)>>6;by<=((source.center.y+maxHop+4)>>6);by++){
+            // A Surge source only needs its immediately adjacent buckets;
+            // fallback power blocks can be reached by a long-range laser.
+            int reach=touching ? source.size+2 : maxHop+4;
+            for(int bx=(source.center.x-reach)>>6;bx<=((source.center.x+reach)>>6);bx++){
+                for(int by=(source.center.y-reach)>>6;by<=((source.center.y+reach)>>6);by++){
                     buckets.computeIfAbsent(((long)bx<<32) ^ (by&0xffffffffL),k->new ArrayList<>()).add(source);
                 }
             }
         }
         return buckets;
     }
-    // Size of source is accounted for by the game's actual laser radius when
-    // configured; use a conservative center-to-center threshold for planning.
-    private static Source findSource(Map<Long,List<Source>> buckets,Point candidate,Grid grid){
+    // Surge Tower sources require physical side contact; other source blocks
+    // use a conservative center-to-center laser range for the first link.
+    public static boolean touches(Point a,int as,Point b,int bs){
+        int ax=a.x-((as-1)/2),ay=a.y-((as-1)/2);
+        int bx=b.x-((bs-1)/2),by=b.y-((bs-1)/2);
+        boolean xOverlap=ax<bx+bs && bx<ax+as;
+        boolean yOverlap=ay<by+bs && by<ay+as;
+        return ((ax+as==bx || bx+bs==ax) && yOverlap) ||
+            ((ay+as==by || by+bs==ay) && xOverlap);
+    }
+    private static Source findSource(Map<Long,List<Source>> buckets,Point candidate,Grid grid,boolean touching){
         List<Source> sources=buckets.get(key(candidate.x,candidate.y));
         if(sources==null) return null;
         Source best=null;
@@ -155,7 +186,8 @@ public final class SurgePlanner{
         for(Source source:sources){
             long dx=(long)candidate.x-source.center.x,dy=(long)candidate.y-source.center.y;
             long d=dx*dx+dy*dy;
-            if(d>=(long)maxHop*maxHop || d>=distance ||
+            if(d>=distance ||
+                (touching ? !touches(candidate,2,source.center,source.size) : d>=(long)maxHop*maxHop) ||
                 !grid.linkClear(candidate.x,candidate.y,source.center.x,source.center.y)) continue;
             best=source;distance=d;
         }
