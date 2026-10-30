@@ -2,6 +2,9 @@ package mindustrytools;
 
 import arc.Events;
 import arc.scene.event.Touchable;
+import arc.scene.Element;
+import arc.scene.ui.layout.Scl;
+import arc.math.geom.Vec2;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import autodrill.AutoDrillMod;
@@ -11,6 +14,7 @@ import minepack.MinePackMod;
 import mindustry.Vars;
 import mindustry.game.EventType.ClientLoadEvent;
 import mindustry.game.EventType.WorldLoadEvent;
+import mindustry.game.EventType.ResetEvent;
 import mindustry.mod.Mod;
 import mindustry.ui.Styles;
 import solarpack.SolarPackMod;
@@ -27,44 +31,63 @@ public class MindustryToolsMod extends Mod{
     private final MinePackMod mine = new MinePackMod();
     private final MegaPriorityMod mega = new MegaPriorityMod();
     private boolean packOpen, hudInstalled;
+    private Table panelFrame;
+    private static final float gap=10f, packGutter=6f;
 
     public MindustryToolsMod(){
-        Events.on(WorldLoadEvent.class, event -> packOpen = false);
+        Events.on(WorldLoadEvent.class, event -> {packOpen = false; panelFrame = null;});
+        Events.on(ResetEvent.class, event -> panelFrame = null);
         Events.on(ClientLoadEvent.class, event -> {
             if(hudInstalled) return;
             hudInstalled = true;
-            Vars.ui.hudGroup.fill(hud -> {
-                hud.touchable = Touchable.childrenOnly;
-                hud.bottom().right();
-                hud.visible(() -> Vars.state != null && Vars.state.isGame() &&
-                    Vars.ui.hudfrag.shown() && Vars.control != null && Vars.control.input != null);
-                hud.table(options -> {
-                    options.right();
-                    option(options, "Mega priority", mega::selectedAllManagedNow, mega::toggleSelection);
-                    options.row();
-                    option(options, "Auto-drill", drill::armed, () -> select(Tool.drill));
-                    options.row();
-                    option(options, "Surge", surge::armed, () -> select(Tool.surge));
-                    options.row();
-                    option(options, "Pack", () -> packOpen, () -> packOpen = !packOpen);
-                }).padRight(404f).padBottom(6f);
-            });
-            // Independent bottom-right overlay: parent buttons stay fixed
-            // while four pack buttons appear in a row to Pack's left.
-            Vars.ui.hudGroup.fill(popup -> {
-                popup.touchable = Touchable.childrenOnly;
-                popup.bottom().right();
-                popup.visible(() -> packOpen && Vars.state != null && Vars.state.isGame() &&
-                    Vars.ui.hudfrag.shown() && Vars.control != null && Vars.control.input != null);
-                popup.table(packs -> {
-                    packs.right();
-                    option(packs, "Wall", wall::armed, () -> select(Tool.wall));
-                    option(packs, "Battery", battery::armed, () -> select(Tool.battery));
-                    option(packs, "Solar", solar::armed, () -> select(Tool.solar));
-                    option(packs, "Mine", mine::armed, () -> select(Tool.mine));
-                }).padRight(585f).padBottom(6f);
-            });
+            Table main=new Table();
+            main.right();
+            option(main,"Mega priority",mega::selectedAllManagedNow,mega::toggleSelection);
+            main.row();
+            option(main,"Auto-drill",drill::armed,()->select(Tool.drill));
+            main.row();
+            option(main,"Surge",surge::armed,()->select(Tool.surge));
+            main.row();
+            option(main,"Pack",()->packOpen,()->packOpen=!packOpen);
+            main.pack();
+            main.visible(() -> hudVisible());
+            main.update(() -> main.setPosition(panelLeft()-Scl.scl(gap)-main.getWidth(),Scl.scl(6f)));
+            Vars.ui.hudGroup.addChild(main);
+
+            Table packs=new Table();
+            packs.right();
+            option(packs,"Wall",wall::armed,()->select(Tool.wall));
+            option(packs,"Battery",battery::armed,()->select(Tool.battery));
+            option(packs,"Solar",solar::armed,()->select(Tool.solar));
+            option(packs,"Mine",mine::armed,()->select(Tool.mine));
+            packs.pack();
+            packs.visible(() -> hudVisible() && packOpen);
+            packs.update(() -> packs.setPosition(panelLeft()-Scl.scl(gap*2f+packGutter)-main.getWidth()-packs.getWidth(),Scl.scl(6f)));
+            Vars.ui.hudGroup.addChild(packs);
         });
+    }
+
+    private boolean hudVisible(){
+        return Vars.state!=null && Vars.state.isGame() && Vars.ui.hudfrag.shown() &&
+            Vars.control!=null && Vars.control.input!=null;
+    }
+
+    /** The build/command menu shares an outer frame; find it through the
+     * named child of the build categories, then read its live stage bounds. */
+    private float panelLeft(){
+        if(panelFrame==null || panelFrame.parent==null || panelFrame.parent.parent==null){
+            Element input=arc.Core.scene.find("inputTable");
+            if(input!=null){
+                // inputTable -> blocksSelect -> blockCatTable -> Stack -> frame
+                Element e=input;
+                for(int i=0;i<4 && e!=null;i++) e=e.parent;
+                if(e instanceof Table frame && frame.parent!=null) panelFrame=frame;
+            }
+        }
+        if(panelFrame==null || panelFrame.parent==null || panelFrame.parent.parent==null){
+            return arc.Core.scene.getWidth()-Scl.scl(404f-10f);
+        }
+        return panelFrame.localToStageCoordinates(new Vec2(0f,0f)).x;
     }
 
     private void option(Table table, String label, arc.func.Boolp checked, Runnable action){

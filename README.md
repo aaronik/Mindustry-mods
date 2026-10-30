@@ -28,7 +28,7 @@ If building/installing locally on the above Steam macOS installation, `cd mindus
 
 ## Use
 
-Beside the bottom-right build menu, **Mega priority**, **Auto-drill**, **Surge**, and **Pack** are always visible (top to bottom). **Pack** is the bottom button and starts closed; click it to show **Wall**, **Battery**, **Solar**, and **Mine** in a single row to its left, and click again to hide them. The main buttons stay in place. An armed packing tool stays armed if Pack is closed; open Pack and select it again to cancel. Choosing another construction tool disarms the previous one.
+Attached to the left edge of Mindustry’s bottom-right build/command menu, **Mega priority**, **Auto-drill**, **Surge**, and **Pack** are always visible (top to bottom). **Pack** is the bottom button and starts closed; click it to show **Wall**, **Battery**, **Solar**, and **Mine** in a single row to its left, and click again to hide them. The main buttons stay in place. An armed packing tool stays armed if Pack is closed; open Pack and select it again to cancel. Choosing another construction tool disarms the previous one.
 
 * **Auto-drill:** Select a drill first (or use the unlocked pneumatic fallback), select Auto-drill, then click an ore patch.
 * **Surge:** Click Surge, then click a destination on the map. It searches across the whole map in batches, places towers up to about 38 tiles apart with explicit power links, strongly favors black map-wall edges even if that uses more towers, and side-touches a reachable friendly Surge Tower on the destination-facing side when possible, or links from up to about 38 tiles away when falling back to a friendly power node, solar panel, or battery. Thousands-tile routes may take several seconds to plan.
