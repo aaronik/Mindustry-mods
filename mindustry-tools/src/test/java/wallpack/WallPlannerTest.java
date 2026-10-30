@@ -37,6 +37,16 @@ public class WallPlannerTest{
             for(int y=0;y<12;y++)for(int x=0;x<12;x++)if(r.nextFloat()<0.14)random.blocked.add(new WallPlanner.Point(x,y));
             verify(random,WallPlanner.plan(random,0,0,11,11,2,0),0,0,11,11,2,0);
         }
+        Grid wide=new Grid();
+        var full=WallPlanner.plan(wide,0,0,199,199,2,0);
+        check(full.panels().size()==10000&&full.batteries().isEmpty(),
+            "200x200 must fit 10,000 2x2 walls exactly");
+        verify(wide,full,0,0,199,199,2,0);
+        wide.blocked.add(new WallPlanner.Point(100,100));
+        var withObstacle=WallPlanner.plan(wide,0,0,199,199,2,0);
+        check(withObstacle.panels().size()<10000,
+            "existing building in large area must prevent full packing");
+        verify(wide,withObstacle,0,0,199,199,2,0);
         check(WallPackMod.mayPlaceOver(true,false,false),"empty tile should be buildable");
         check(WallPackMod.mayPlaceOver(false,true,false),"removable props should be buildable");
         check(!WallPackMod.mayPlaceOver(false,false,false),"unreplaceable terrain should remain blocked");

@@ -25,8 +25,8 @@ import java.util.Set;
 
 /** HUD button + map drag tool; never places finished blocks directly. */
 public class WallPackMod extends Mod{
-    private static final int maxSide = 60;
-    private static final int maxArea = 2500;
+    private static final int maxSide = 200;
+    private static final int maxArea = 40000;
     private boolean armed, dragging, hudInstalled;
     private Block largeWall, smallWall;
     private int startX, startY, endX, endY;

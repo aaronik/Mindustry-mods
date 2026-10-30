@@ -37,7 +37,7 @@ Attached to the left edge of Mindustry’s bottom-right build/command menu, **Cl
 * **Solar / Battery / Wall / Mine:** Choose an option under Pack, then drag out a rectangular area. Mine queues Shock Mines; select a wall type first if you want a material other than copper.
 * **Mega priority:** Select friendly Megas in command mode and choose Mega priority. Choosing a vanilla command disables automation for those selected Megas. This opt-in resets when a new map loads.
 
-All four Pack modes (and Auto-drill) avoid existing buildings and your queued plans, but can build over removable natural props. Solar-pack and Battery-pack have a 200×200-tile selection limit; Wall-pack and Mine each have a 60-tile-per-side, 2,500-tile-area limit. Tools do not instantly construct blocks. Success and cancellation are silent; errors show toasts.
+All four Pack modes (and Auto-drill) avoid existing buildings and your queued plans, but can build over removable natural props. Solar-pack, Battery-pack, and Wall-pack each allow up to 200×200 tiles; Mine remains limited to 60 tiles per side and 2,500 tiles total. A completely open 200×200 Wall selection queues 10,000 large walls, so construction may take time. Tools do not instantly construct blocks. Success and cancellation are silent; errors show toasts.
 
 ## Build and test
 
