@@ -11,6 +11,7 @@ import autodrill.AutoDrillMod;
 import batterypack.BatteryPackMod;
 import megapriority.MegaPriorityMod;
 import minepack.MinePackMod;
+import propcleanup.PropCleanupMod;
 import mindustry.Vars;
 import mindustry.game.EventType.ClientLoadEvent;
 import mindustry.game.EventType.WorldLoadEvent;
@@ -30,6 +31,7 @@ public class MindustryToolsMod extends Mod{
     private final WallPackMod wall = new WallPackMod();
     private final MinePackMod mine = new MinePackMod();
     private final MegaPriorityMod mega = new MegaPriorityMod();
+    private final PropCleanupMod cleanup = new PropCleanupMod();
     private boolean packOpen, hudInstalled;
     private Table panelFrame;
     private static final float gap=10f, packGutter=6f;
@@ -42,6 +44,8 @@ public class MindustryToolsMod extends Mod{
             hudInstalled = true;
             Table main=new Table();
             main.right();
+            option(main,"Clear props",cleanup::running,cleanup::toggle);
+            main.row();
             option(main,"Mega priority",mega::selectedAllManagedNow,mega::toggleSelection);
             main.row();
             option(main,"Auto-drill",drill::armed,()->select(Tool.drill));
