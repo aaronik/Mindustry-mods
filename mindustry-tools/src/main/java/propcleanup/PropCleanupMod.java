@@ -29,7 +29,7 @@ public class PropCleanupMod extends Mod{
     public void toggle(){
         if(!ready())return;
         if(running){cancel();return;}
-        Vars.ui.showConfirm("Remove natural props", "Queue removal of all breakable, automatically replaceable natural props on this map? Existing buildings and black map walls will be left alone.", this::start);
+        start();
     }
     private boolean ready(){
         return Vars.state!=null && Vars.state.isGame() && Vars.player!=null &&
