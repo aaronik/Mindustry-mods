@@ -46,8 +46,8 @@ public class SurgePlannerTest{
         var power=new SurgePlanner.Source(new SurgePlanner.Point(18,10),1);
         var dst=new SurgePlanner.Point(24,10);
         var route=plan(g,dst,List.of(far,near),List.of(power),4);
-        check(route!=null && route.usedExistingTower(),"prefer reachable Surge Towers");
-        check(route.source().equals(near),"choose nearest reachable Surge chain");
+        check(route!=null && !route.usedExistingTower(),"stop at reachable power node near destination");
+        check(route.source().equals(power),"do not extend beyond the first powered connection");
         verify(route,g);
         check(!SurgePlanner.inRange(new SurgePlanner.Point(0,0),new SurgePlanner.Point(40,0)),"40 tiles is outside conservative hop range");
         Grid walled=new Grid(45,45);
@@ -97,6 +97,18 @@ public class SurgePlannerTest{
             "side-touching towers connect without a laser link");
         check(!SurgePlanner.touches(new SurgePlanner.Point(0,0),2,new SurgePlanner.Point(2,2),2),
             "diagonal corners cannot connect as Surge sources");
+        Grid longMap=new Grid(310,40);
+        var origin=new SurgePlanner.Source(new SurgePlanner.Point(12,16),2);
+        var middlePower=new SurgePlanner.Source(new SurgePlanner.Point(116,16),1);
+        var overrun=plan(longMap,new SurgePlanner.Point(278,16),List.of(origin),List.of(middlePower),11);
+        verify(overrun,longMap);
+        check(!overrun.usedExistingTower() && overrun.source().equals(middlePower),
+            "route must terminate at intermediate power node, not continue to original tower");
+        check(overrun.towers().get(0).x()>65,
+            "no extra source-side towers beyond the intermediate power node: "+overrun.towers());
+        var onlyTowers=plan(g,dst,List.of(far,near),List.of(),7);
+        check(onlyTowers!=null&&onlyTowers.usedExistingTower()&&onlyTowers.source().equals(near),
+            "with no closer power node, join nearest reachable Surge chain");
         var fallback=plan(g,dst,List.of(),List.of(power),7);
         check(fallback!=null && !fallback.usedExistingTower(),"fallback to power structure");
         verify(fallback,g);

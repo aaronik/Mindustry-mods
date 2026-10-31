@@ -113,8 +113,8 @@ public class SurgeScenariosTest{
             List.of(new SurgePlanner.Source(new SurgePlanner.Point(4,30),1)),9)==null,
             "no valid placement near click must fail without plans");
 
-        // Nearer Surge chain is inaccessible due to insulated ring; fall back
-        // to the farther reachable Surge chain, not an unrelated battery.
+        // The Surge source is blocked; a power node nearer the destination
+        // should terminate the route before it extends toward a far tower.
         MapGrid multiple=new MapGrid(200,120);
         multiple.rect(80,35,100,56,INSULATED);
         var unreachable=new SurgePlanner.Source(new SurgePlanner.Point(90,45),2);
@@ -122,8 +122,8 @@ public class SurgeScenariosTest{
         var secondary=route(multiple,new SurgePlanner.Point(165,45),
             List.of(unreachable,reachable),List.of(new SurgePlanner.Source(new SurgePlanner.Point(140,45),1)),27);
         validate(multiple,secondary,new SurgePlanner.Point(165,45));
-        check(secondary.usedExistingTower()&&secondary.source().equals(reachable),
-            "must choose reachable Surge source rather than power fallback");
+        check(!secondary.usedExistingTower() && secondary.source().center().equals(new SurgePlanner.Point(140,45)),
+            "must stop at the nearer connected power node rather than continue past it");
 
         // Click adjacent to the world boundary: no path can extend outside
         // the map, but the remaining legal side can still connect.

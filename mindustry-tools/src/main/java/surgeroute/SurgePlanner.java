@@ -133,7 +133,7 @@ public final class SurgePlanner{
             }
             if(frontier.isEmpty()){
                 Route chosen=bestTower!=null ? bestTower : fallback;
-                result=chosen==null ? null : simplify(chosen,grid);
+                result=chosen==null ? null : simplify(trimAtFirstPower(chosen,grid,towerGoals,fallbackGoals),grid);
                 finished=true;
             }
             return finished;
@@ -156,6 +156,26 @@ public final class SurgePlanner{
             if(valid[index]==0) valid[index]=(byte)(grid.validTower(x,y)?1:-1);
             return valid[index]==1;
         }
+    }
+
+    /** Once the path has reached any existing power source, towers beyond
+     * that connection serve no purpose. Walk from the destination backwards,
+     * choosing the first connectable source. */
+    private static Route trimAtFirstPower(Route route,Grid grid,
+                                           Map<Long,List<Source>> surgeGoals,
+                                           Map<Long,List<Source>> powerGoals){
+        List<Point> path=route.towers(); // source -> destination
+        for(int i=path.size()-1;i>=0;i--){
+            Point point=path.get(i);
+            Source surge=findSource(surgeGoals,point,grid,true);
+            Source power=findSource(powerGoals,point,grid,false);
+            if(surge==null && power==null)continue;
+            // Prefer adjacency if both are available at the same tower.
+            boolean existing=surge!=null;
+            return new Route(new ArrayList<>(path.subList(i,path.size())),
+                existing?surge:power,existing);
+        }
+        return route;
     }
 
     /** Remove redundant towers from a chosen route, while preserving the
