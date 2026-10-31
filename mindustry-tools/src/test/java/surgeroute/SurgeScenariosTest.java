@@ -145,6 +145,48 @@ public class SurgeScenariosTest{
             List.of(new SurgePlanner.Source(new SurgePlanner.Point(5,30),1)),13)==null,
             "insulated source must not be falsely connected");
 
+        // Perpendicular branch into a pre-existing horizontal tower chain:
+        // new first tower must be on the destination-facing side rather
+        // than behind any selected origin tower.
+        MapGrid branchWall=new MapGrid(250,250){
+            @Override public int wallEdges(int x,int y){return y>=74 && y<=80 ? 4 : 0;}
+        };
+        List<SurgePlanner.Source> horizontal=List.of(
+            new SurgePlanner.Source(new SurgePlanner.Point(48,90),2),
+            new SurgePlanner.Source(new SurgePlanner.Point(88,90),2),
+            new SurgePlanner.Source(new SurgePlanner.Point(128,90),2));
+        var branch=route(branchWall,new SurgePlanner.Point(90,210),horizontal,List.of(),19);
+        validate(branchWall,branch,new SurgePlanner.Point(90,210));
+        check(branch.source().equals(horizontal.get(1)),"must join nearest reachable chain tower");
+        check(branch.towers().get(0).y()>branch.source().center().y(),
+            "first new tower must face destination, not appear behind chain");
+        // Cheap wall tiles can produce a dense near-source chain. If a tower
+        // can directly reach the next-but-one, it is unnecessary and should
+        // not be queued merely for its wall-edge bonus.
+        MapGrid cheapWall=new MapGrid(140,90){
+            @Override public int wallEdges(int x,int y){return x<80 && y>=34 && y<=35 ? 4 : 0;}
+        };
+        var streamlined=route(cheapWall,new SurgePlanner.Point(125,49),
+            List.of(new SurgePlanner.Source(new SurgePlanner.Point(7,49),2)),List.of(),25);
+        validate(cheapWall,streamlined,new SurgePlanner.Point(125,49));
+        for(int i=0;i+2<streamlined.towers().size();i++){
+            var from=streamlined.towers().get(i);
+            var skip=streamlined.towers().get(i+2);
+            check(!SurgePlanner.inRange(from,skip) || !cheapWall.linkClear(from.x(),from.y(),skip.x(),skip.y()),
+                "redundant near-source tower despite direct laser hop");
+        }
+        // Simplification must retain a middle tower if an insulated block
+        // prevents a direct link across it.
+        MapGrid blockedShortcut=new MapGrid(110,60){
+            @Override public boolean linkClear(int x,int y,int tx,int ty){
+                return !(x==20&&tx==50) && !(x==50&&tx==20);
+            }
+        };
+        var example=new SurgePlanner.Route(List.of(new SurgePlanner.Point(20,20),
+            new SurgePlanner.Point(34,20),new SurgePlanner.Point(50,20)),
+            new SurgePlanner.Source(new SurgePlanner.Point(18,20),2),true);
+        check(SurgePlanner.simplify(example,blockedShortcut).towers().size()==3,
+            "cannot prune tower across blocked power link");
         // Deterministic field fuzz: irregular cliffs, props, buildings, and
         // insulated obstacles. Every returned path must satisfy the invariants.
         for(int seed=0;seed<12;seed++){

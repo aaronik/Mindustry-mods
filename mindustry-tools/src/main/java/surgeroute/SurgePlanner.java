@@ -124,7 +124,7 @@ public final class SurgePlanner{
                     // one. Detours that keep towers beside map walls can win
                     // over a shorter route crossing open buildable space.
                     int cost=node.cost+(edge>0 ? 150 : 1000)+
-                        (maxHop-(int)Math.hypot(nx-x,ny-y))*2;
+                        (maxHop-(int)Math.hypot(nx-x,ny-y))*8;
                     if(cost>=costs[next]) continue;
                     costs[next]=cost;
                     parents[next]=index;
@@ -132,7 +132,8 @@ public final class SurgePlanner{
                 }
             }
             if(frontier.isEmpty()){
-                result=bestTower!=null ? bestTower : fallback;
+                Route chosen=bestTower!=null ? bestTower : fallback;
+                result=chosen==null ? null : simplify(chosen,grid);
                 finished=true;
             }
             return finished;
@@ -155,6 +156,32 @@ public final class SurgePlanner{
             if(valid[index]==0) valid[index]=(byte)(grid.validTower(x,y)?1:-1);
             return valid[index]==1;
         }
+    }
+
+    /** Remove redundant towers from a chosen route, while preserving the
+     * destination and source attachment. Nearby wall-hugging candidates can
+     * be cheap in the search but should not become a dense cluster. */
+    public static Route simplify(Route route,Grid grid){
+        List<Point> original=route.towers();
+        if(original.size()<3) return route;
+        List<Point> result=new ArrayList<>();
+        int at=0;
+        result.add(original.get(at));
+        while(at<original.size()-1){
+            int next=at+1;
+            // Prefer the furthest later tower reachable by one unobstructed
+            // laser hop. All intermediate towers can then be omitted.
+            for(int candidate=original.size()-1;candidate>at+1;candidate--){
+                Point from=original.get(at),to=original.get(candidate);
+                if(inRange(from,to) && grid.linkClear(from.x,from.y,to.x,to.y)){
+                    next=candidate;
+                    break;
+                }
+            }
+            at=next;
+            result.add(original.get(at));
+        }
+        return new Route(result,route.source(),route.usedExistingTower());
     }
 
     private static long distanceSquared(Point a,Point b){
