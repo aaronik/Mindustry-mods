@@ -11,6 +11,7 @@ One mod for **Mindustry Steam 160.7** with a compact **Pack** submenu. It combin
 | Wall-pack | Packs 2×2 large walls of the selected material, then fills legal gaps with small walls. |
 | Mega priority | Opts selected Megas into vanilla Rebuild → Repair → Mine commands. |
 | Mine (Pack submenu) | Densely fills a selected rectangle with 1×1 Shock Mines. |
+| Water (Pack submenu) | Click a water patch to queue Mechanical Pumps and a connected Liquid Router border. |
 | Clear props | Queues removal of auto-replaceable natural map props across the whole map. |
 
 ## Install
@@ -29,12 +30,13 @@ If building/installing locally on the above Steam macOS installation, `cd mindus
 
 ## Use
 
-Attached to the left edge of Mindustry’s bottom-right build/command menu, **Clear props**, **Mega priority**, **Auto-drill**, **Surge**, and **Pack** are always visible (top to bottom). **Pack** is the bottom button and starts closed; click it to show **Wall**, **Battery**, **Solar**, and **Mine** in a single row to its left, and click again to hide them. The main buttons stay in place. An armed packing tool stays armed if Pack is closed; open Pack and select it again to cancel. Choosing another construction tool disarms the previous one.
+Attached to the left edge of Mindustry’s bottom-right build/command menu, **Clear props**, **Mega priority**, **Auto-drill**, **Surge**, and **Pack** are always visible (top to bottom). **Pack** is the bottom button and starts closed; click it to show **Wall**, **Battery**, **Solar**, **Mine**, and **Water** in a single row to its left, and click again to hide them. The main buttons stay in place. An armed packing tool stays armed if Pack is closed; open Pack and select it again to cancel. Choosing another construction tool disarms the previous one.
 
 * **Clear props:** Click to queue removal plans for breakable natural boulders, clumps, and similar auto-replaceable props across the map. The scan is batched and capped at 10,000 new plans per run; click again during scanning to cancel. Existing buildings, black map walls, and your queued construction footprints are protected.
 * **Auto-drill:** Select a drill first (or use the unlocked pneumatic fallback), select Auto-drill, then click an ore patch.
 * **Surge:** Click Surge, then click a destination on the map. It searches across the whole map in batches, places towers up to about 38 tiles apart with explicit power links, strongly favors black map-wall edges and prunes redundant towers when a direct laser hop is possible, and stops at the first reachable existing power source along the route rather than extending past a powered node. It side-touches a Surge Tower or links from up to about 38 tiles away to a friendly power node, solar panel, or battery. Thousands-tile routes may take several seconds to plan.
 * **Solar / Battery / Wall / Mine:** Choose an option under Pack, then drag out a rectangular area. Mine queues Shock Mines; select a wall type first if you want a material other than copper.
+* **Water:** Choose it under Pack, then click a water tile. It queues Mechanical Pumps and side-connected Liquid Routers around them.
 * **Mega priority:** Select friendly Megas in command mode and choose Mega priority. Choosing a vanilla command disables automation for those selected Megas. This opt-in resets when a new map loads.
 
 All four Pack modes (and Auto-drill) avoid existing buildings and your queued plans, but can build over removable natural props. Solar-pack, Battery-pack, and Wall-pack each allow up to 200×200 tiles; Mine remains limited to 60 tiles per side and 2,500 tiles total. A completely open 200×200 Wall selection queues 10,000 large walls, so construction may take time. Tools do not instantly construct blocks. Success and cancellation are silent; errors show toasts.

@@ -21,6 +21,7 @@ import mindustry.ui.Styles;
 import solarpack.SolarPackMod;
 import surgeroute.SurgeRouteMod;
 import wallpack.WallPackMod;
+import waterpack.WaterPackMod;
 
 /** One HUD column for all five tools; Pack is the sole submenu. */
 public class MindustryToolsMod extends Mod{
@@ -30,6 +31,7 @@ public class MindustryToolsMod extends Mod{
     private final BatteryPackMod battery = new BatteryPackMod();
     private final WallPackMod wall = new WallPackMod();
     private final MinePackMod mine = new MinePackMod();
+    private final WaterPackMod water = new WaterPackMod();
     private final MegaPriorityMod mega = new MegaPriorityMod();
     private final PropCleanupMod cleanup = new PropCleanupMod();
     private boolean packOpen, hudInstalled;
@@ -64,6 +66,7 @@ public class MindustryToolsMod extends Mod{
             option(packs,"Battery",battery::armed,()->select(Tool.battery));
             option(packs,"Solar",solar::armed,()->select(Tool.solar));
             option(packs,"Mine",mine::armed,()->select(Tool.mine));
+            option(packs,"Water",water::armed,()->select(Tool.water));
             packs.pack();
             packs.visible(() -> hudVisible() && packOpen);
             packs.update(() -> packs.setPosition(panelLeft()-Scl.scl(gap*2f+packGutter)-main.getWidth()-packs.getWidth(),Scl.scl(6f)));
@@ -100,7 +103,7 @@ public class MindustryToolsMod extends Mod{
         button.clicked(action);
         button.update(() -> button.setChecked(checked.get()));
     }
-    private enum Tool{drill,surge,solar,battery,wall,mine}
+    private enum Tool{drill,surge,solar,battery,wall,mine,water}
     private void select(Tool tool){
         if(tool != Tool.drill && drill.armed()) drill.toggle();
         if(tool != Tool.surge && surge.armed()) surge.toggle();
@@ -108,6 +111,7 @@ public class MindustryToolsMod extends Mod{
         if(tool != Tool.battery && battery.armed()) battery.toggle();
         if(tool != Tool.wall && wall.armed()) wall.toggle();
         if(tool != Tool.mine && mine.armed()) mine.toggle();
+        if(tool != Tool.water && water.armed()) water.toggle();
         switch(tool){
             case drill -> drill.toggle();
             case surge -> surge.toggle();
@@ -115,6 +119,7 @@ public class MindustryToolsMod extends Mod{
             case battery -> battery.toggle();
             case wall -> wall.toggle();
             case mine -> mine.toggle();
+            case water -> water.toggle();
         }
         // Pack stays open until its button is clicked again.
     }
