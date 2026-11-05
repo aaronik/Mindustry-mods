@@ -97,6 +97,20 @@ public class SurgePlannerTest{
             "side-touching towers connect without a laser link");
         check(!SurgePlanner.touches(new SurgePlanner.Point(0,0),2,new SurgePlanner.Point(2,2),2),
             "diagonal corners cannot connect as Surge sources");
+        check(SurgeRouteMod.hasPowerSource(true,false),"solar generator is a real source");
+        check(SurgeRouteMod.hasPowerSource(false,true),"charged battery is a real source");
+        check(!SurgeRouteMod.hasPowerSource(false,false),
+            "isolated empty battery or unpowered node must not truncate route");
+        Grid wideOpen=new Grid(420,60);
+        var remoteSource=new SurgePlanner.Source(new SurgePlanner.Point(5,25),1);
+        var farRoute=plan(wideOpen,new SurgePlanner.Point(390,25),List.of(),List.of(remoteSource),17);
+        verify(farRoute,wideOpen);
+        check(farRoute.towers().size()>=9,
+            "far outside source range must queue a multi-tower route: "+farRoute);
+        var localRoute=plan(wideOpen,new SurgePlanner.Point(25,25),List.of(),List.of(remoteSource),17);
+        verify(localRoute,wideOpen);
+        check(localRoute.towers().size()==1,
+            "destination already within source range only needs one tower");
         Grid longMap=new Grid(310,40);
         var origin=new SurgePlanner.Source(new SurgePlanner.Point(12,16),2);
         var middlePower=new SurgePlanner.Source(new SurgePlanner.Point(116,16),1);

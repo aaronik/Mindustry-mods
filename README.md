@@ -13,6 +13,8 @@ One mod for **Mindustry Steam 160.7** with a compact **Pack** submenu. It combin
 | Mine (Pack submenu) | Densely fills a selected rectangle with 1×1 Shock Mines. |
 | Water (Pack submenu) | Click a water patch to queue Mechanical Pumps and a connected Liquid Router border. |
 | Clear props | Queues removal of auto-replaceable natural map props across the whole map. |
+| Auto-wave | Automatically sends each next wave when Mindustry enables its wave button. |
+| Redir pads | Redirects all exporting sectors on this planet to the current campaign sector in one click. |
 
 ## Install
 
@@ -30,8 +32,10 @@ If building/installing locally on the above Steam macOS installation, `cd mindus
 
 ## Use
 
-Attached to the left edge of Mindustry’s bottom-right build/command menu, **Clear props**, **Mega priority**, **Auto-drill**, **Surge**, and **Pack** are always visible (top to bottom). **Pack** is the bottom button and starts closed; click it to show **Wall**, **Battery**, **Solar**, **Mine**, and **Water** in a single row to its left, and click again to hide them. The main buttons stay in place. An armed packing tool stays armed if Pack is closed; open Pack and select it again to cancel. Choosing another construction tool disarms the previous one.
+Attached to the left edge of Mindustry’s bottom-right build/command menu, **Auto-wave**, **Redir pads**, **Clear props**, **Mega priority**, **Auto-drill**, **Surge**, and **Pack** are always visible (top to bottom). **Pack** is the bottom button and starts closed; click it to show **Wall**, **Battery**, **Solar**, **Mine**, and **Water** in a single row to its left, and click again to hide them. The main buttons stay in place. An armed packing tool stays armed if Pack is closed; open Pack and select it again to cancel. Choosing another construction tool disarms the previous one.
 
+* **Auto-wave:** Toggle on to send the next wave each time Mindustry permits it (no remaining enemies or active spawns). Toggle off to stop; it resets to off on map load. It waits at least one second between requests and respects server permissions.
+* **Redir pads:** In a local campaign sector, click once to redirect all other exporting sectors on the current planet to send their exports here. It saves their destinations and refreshes import rates. Not available from a multiplayer client or when legacy launch pads are enabled.
 * **Clear props:** Click to queue removal plans for breakable natural boulders, clumps, and similar auto-replaceable props across the map. The scan is batched and capped at 10,000 new plans per run; click again during scanning to cancel. Existing buildings, black map walls, and your queued construction footprints are protected.
 * **Auto-drill:** Select a drill first (or use the unlocked pneumatic fallback), select Auto-drill, then click an ore patch.
 * **Surge:** Click Surge, then click a destination on the map. It searches across the whole map in batches, places towers up to about 38 tiles apart with explicit power links, strongly favors black map-wall edges and prunes redundant towers when a direct laser hop is possible, and stops at the first reachable existing power source along the route rather than extending past a powered node. It side-touches a Surge Tower or links from up to about 38 tiles away to a friendly power node, solar panel, or battery. Thousands-tile routes may take several seconds to plan.

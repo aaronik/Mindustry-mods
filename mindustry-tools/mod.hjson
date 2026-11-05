@@ -2,7 +2,7 @@ name: mindustry-tools
 displayName: Mindustry Tools
 author: Aaron
 main: mindustrytools.MindustryToolsMod
-description: Auto-drill, Surge routing, Water and other Pack tools, prop cleanup and Mega Priority.
-version: 1.10.0
+description: Auto-wave, export redirect, Auto-drill, Surge routing, Pack tools and Mega Priority.
+version: 1.12.0
 minGameVersion: 160.7
 hidden: true

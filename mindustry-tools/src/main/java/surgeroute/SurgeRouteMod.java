@@ -85,6 +85,8 @@ public class SurgeRouteMod extends Mod{
             SurgePlanner.Route route=search.result();
             search=null;searchWorld=null;
             if(route==null){toast("No placeable Surge Tower route to the selected point.");return;}
+            arc.util.Log.info("[Mindustry Tools] Surge route: @ planned towers; destination source @; existing tower source=@; queue before=@",
+                route.towers().size(),route.source().center(),route.usedExistingTower(),Vars.player.unit().plans().size);
             Block tower=Blocks.surgeTower;
             for(int i=0;i<route.towers().size();i++){
                 SurgePlanner.Point p=route.towers().get(i);
@@ -100,6 +102,7 @@ public class SurgeRouteMod extends Mod{
                 tower.onNewPlan(plan);
                 Vars.player.unit().addBuild(plan);
             }
+            arc.util.Log.info("[Mindustry Tools] Surge queue after=@",Vars.player.unit().plans().size);
         }
     }
     private void reconcileLinks(){
@@ -142,7 +145,7 @@ public class SurgeRouteMod extends Mod{
                 build.power==null) continue;
             SurgePlanner.Source source=new SurgePlanner.Source(new SurgePlanner.Point(build.tileX(),build.tileY()),build.block.size);
             if(build.block==tower) existing.add(source);
-            else if(isFallback(build.block) &&
+            else if(isFallback(build.block) && hasPowerSource(build) &&
                 (!(build.block instanceof mindustry.world.blocks.power.PowerNode node) ||
                     build.power.links.size < node.maxNodes)) fallback.add(source);
         }
@@ -181,6 +184,14 @@ public class SurgeRouteMod extends Mod{
         };
         search=new SurgePlanner.Search(grid,new SurgePlanner.Point(x,y),existing,fallback);
         searchWorld=Vars.world;
+    }
+    static boolean hasPowerSource(boolean hasProducer,boolean storedPower){
+        return hasProducer || storedPower;
+    }
+    private static boolean hasPowerSource(Building build){
+        return build.power!=null && build.power.graph!=null &&
+            hasPowerSource(!build.power.graph.producers.isEmpty(),
+                build.power.graph.getBatteryStored()>0.01f);
     }
     private static boolean isFallback(Block block){
         return block==Blocks.powerNode || block==Blocks.powerNodeLarge ||
