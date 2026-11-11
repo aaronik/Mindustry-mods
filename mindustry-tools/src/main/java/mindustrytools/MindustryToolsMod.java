@@ -58,8 +58,6 @@ public class MindustryToolsMod extends Mod{
             main.row();
             option(main,"Mega priority",mega::selectedAllManagedNow,mega::toggleSelection);
             main.row();
-            option(main,"Auto-drill",drill::armed,()->select(Tool.drill));
-            main.row();
             option(main,"Surge",surge::armed,()->select(Tool.surge));
             main.row();
             option(main,"Pack",()->packOpen,()->packOpen=!packOpen);
@@ -75,6 +73,7 @@ public class MindustryToolsMod extends Mod{
             option(packs,"Solar",solar::armed,()->select(Tool.solar));
             option(packs,"Mine",mine::armed,()->select(Tool.mine));
             option(packs,"Water",water::armed,()->select(Tool.water));
+            option(packs,"Drill",drill::armed,()->select(Tool.drill));
             packs.pack();
             packs.visible(() -> hudVisible() && packOpen);
             packs.update(() -> packs.setPosition(panelLeft()-Scl.scl(gap*2f+packGutter)-main.getWidth()-packs.getWidth(),Scl.scl(6f)));
