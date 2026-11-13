@@ -2,7 +2,7 @@ name: mindustry-tools
 displayName: Mindustry Tools
 author: Aaron
 main: mindustrytools.MindustryToolsMod
-description: 100x speed, Auto-wave, export redirect, Auto-drill, Surge routing, Pack tools and Mega Priority.
-version: 1.13.0
+description: 500x speed, Auto-wave, export redirect, Auto-drill, Surge routing, Pack tools and Mega Priority.
+version: 1.13.1
 minGameVersion: 160.7
 hidden: true

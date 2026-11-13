@@ -30,7 +30,7 @@ public class TimeSpeedMod extends Mod{
     public void toggle(){
         if(enabled){reset();return;}
         if(!available()){
-            if(Vars.ui!=null)Vars.ui.hudfrag.showToast("100x speed is available only in local single-player games.");
+            if(Vars.ui!=null)Vars.ui.hudfrag.showToast("500x speed is available only in local single-player games.");
             return;
         }
         enabled=true;
