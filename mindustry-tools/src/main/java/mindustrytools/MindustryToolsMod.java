@@ -29,6 +29,7 @@ import waterpack.WaterPackMod;
 /** One HUD column for all five tools; Pack is the sole submenu. */
 public class MindustryToolsMod extends Mod{
     private final enemyinfo.EnemyInfoMod enemyInfo = new enemyinfo.EnemyInfoMod();
+    private final unitbars.UnitBarsMod unitBars = new unitbars.UnitBarsMod();
     private final AutoDrillMod drill = new AutoDrillMod();
     private final SurgeRouteMod surge = new SurgeRouteMod();
     private final SolarPackMod solar = new SolarPackMod();
@@ -74,6 +75,8 @@ public class MindustryToolsMod extends Mod{
             option(main,"Redir pads",()->false,padRedirect::redirect);
             main.row();
             option(main,"Clear props",cleanup::running,cleanup::toggle);
+            main.row();
+            option(main,"Unit HP",unitBars::enabled,unitBars::toggle);
             main.row();
             option(main,"Mega priority",mega::selectedAllManagedNow,mega::toggleSelection);
             main.row();
