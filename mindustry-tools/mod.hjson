@@ -2,7 +2,7 @@ name: mindustry-tools
 displayName: Mindustry Tools
 author: Aaron
 main: mindustrytools.MindustryToolsMod
-description: Enemy hover info, 2/5/100 speed presets, Auto-wave, export redirect, Auto-drill, Surge routing, Pack tools and Mega Priority.
-version: 1.14.0
+description: Sector export browser, enemy hover info, 2/5/100 speed presets, Auto-wave, export redirect and construction tools.
+version: 1.15.0
 minGameVersion: 160.7
 hidden: true

@@ -41,6 +41,7 @@ public class MindustryToolsMod extends Mod{
     private final AutoWaveMod autoWave = new AutoWaveMod();
     private final TimeSpeedMod timeSpeed = new TimeSpeedMod();
     private final PadRedirectMod padRedirect = new PadRedirectMod();
+    private final sectorlist.SectorListMod sectorList = new sectorlist.SectorListMod();
     private boolean packOpen, hudInstalled;
     private Table panelFrame;
     private static final float gap=10f, packGutter=6f;
@@ -67,6 +68,8 @@ public class MindustryToolsMod extends Mod{
             main.add(speeds).size(175f,45f).pad(0f);
             main.row();
             option(main,"Auto-wave",autoWave::enabled,autoWave::toggle);
+            main.row();
+            option(main,"Sectors",()->false,sectorList::show);
             main.row();
             option(main,"Redir pads",()->false,padRedirect::redirect);
             main.row();
