@@ -28,6 +28,7 @@ import waterpack.WaterPackMod;
 
 /** One HUD column for all five tools; Pack is the sole submenu. */
 public class MindustryToolsMod extends Mod{
+    private final enemyinfo.EnemyInfoMod enemyInfo = new enemyinfo.EnemyInfoMod();
     private final AutoDrillMod drill = new AutoDrillMod();
     private final SurgeRouteMod surge = new SurgeRouteMod();
     private final SolarPackMod solar = new SolarPackMod();
@@ -52,7 +53,18 @@ public class MindustryToolsMod extends Mod{
             hudInstalled = true;
             Table main=new Table();
             main.right();
-            option(main,"100x",timeSpeed::enabled,timeSpeed::toggle);
+            Table speeds=new Table();
+            speeds.margin(0f);
+            int[] presets={2,5,100};
+            float[] widths={58f,58f,59f};
+            for(int i=0;i<presets.length;i++){
+                final int speed=presets[i];
+                TextButton button=speeds.button(Integer.toString(speed),Styles.togglet,()->timeSpeed.select(speed))
+                    .size(widths[i],45f).pad(0f).get();
+                button.setProgrammaticChangeEvents(false);
+                button.update(()->button.setChecked(timeSpeed.multiplier()==speed));
+            }
+            main.add(speeds).size(175f,45f).pad(0f);
             main.row();
             option(main,"Auto-wave",autoWave::enabled,autoWave::toggle);
             main.row();

@@ -10,7 +10,7 @@ import mindustry.mod.Mod;
 
 /** Scales only the simulation's delta; leaves UI timing and the delta provider alone. */
 public class TimeSpeedMod extends Mod{
-    private boolean enabled;
+    private int multiplier=1;
     private boolean scaled;
     private float originalDelta;
 
@@ -19,21 +19,24 @@ public class TimeSpeedMod extends Mod{
         Events.on(ResetEvent.class,event -> reset());
         Events.run(Trigger.update,() -> {
             restoreDelta();
-            if(!available())enabled=false;
+            if(!available())multiplier=1;
         });
         Events.run(Trigger.beforeGameUpdate,this::beforeUpdate);
         Events.run(Trigger.afterGameUpdate,this::restoreDelta);
     }
 
-    public boolean enabled(){return enabled;}
+    public boolean enabled(){return multiplier!=1;}
+    public int multiplier(){return multiplier;}
 
-    public void toggle(){
-        if(enabled){reset();return;}
+    public void select(int requested){
+        if(!SpeedPolicy.preset(requested))return;
+        if(multiplier==requested){reset();return;}
         if(!available()){
-            if(Vars.ui!=null)Vars.ui.hudfrag.showToast("100x speed is available only in local single-player games.");
+            if(Vars.ui!=null)Vars.ui.hudfrag.showToast("Speed controls are available only in local single-player games.");
             return;
         }
-        enabled=true;
+        restoreDelta();
+        multiplier=requested;
     }
 
     private boolean available(){
@@ -43,10 +46,10 @@ public class TimeSpeedMod extends Mod{
     }
 
     private void beforeUpdate(){
-        if(!enabled || !available())return;
+        if(!enabled() || !available())return;
         originalDelta=Time.delta;
         scaled=true;
-        Time.delta=SpeedPolicy.simulationDelta(originalDelta);
+        Time.delta=SpeedPolicy.simulationDelta(originalDelta,multiplier);
     }
 
     private void restoreDelta(){
@@ -55,5 +58,5 @@ public class TimeSpeedMod extends Mod{
         scaled=false;
     }
 
-    private void reset(){enabled=false;restoreDelta();}
+    private void reset(){multiplier=1;restoreDelta();}
 }
