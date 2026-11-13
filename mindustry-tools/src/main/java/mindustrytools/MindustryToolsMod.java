@@ -22,6 +22,7 @@ import mindustry.mod.Mod;
 import mindustry.ui.Styles;
 import solarpack.SolarPackMod;
 import surgeroute.SurgeRouteMod;
+import timespeed.TimeSpeedMod;
 import wallpack.WallPackMod;
 import waterpack.WaterPackMod;
 
@@ -37,6 +38,7 @@ public class MindustryToolsMod extends Mod{
     private final MegaPriorityMod mega = new MegaPriorityMod();
     private final PropCleanupMod cleanup = new PropCleanupMod();
     private final AutoWaveMod autoWave = new AutoWaveMod();
+    private final TimeSpeedMod timeSpeed = new TimeSpeedMod();
     private final PadRedirectMod padRedirect = new PadRedirectMod();
     private boolean packOpen, hudInstalled;
     private Table panelFrame;
@@ -50,6 +52,8 @@ public class MindustryToolsMod extends Mod{
             hudInstalled = true;
             Table main=new Table();
             main.right();
+            option(main,"100x",timeSpeed::enabled,timeSpeed::toggle);
+            main.row();
             option(main,"Auto-wave",autoWave::enabled,autoWave::toggle);
             main.row();
             option(main,"Redir pads",()->false,padRedirect::redirect);
