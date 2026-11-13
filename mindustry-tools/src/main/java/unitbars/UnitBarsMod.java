@@ -17,7 +17,7 @@ import mindustry.graphics.Pal;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-/** Read-only, opt-in bars for the local player's team. */
+/** Read-only, opt-in bars for visible friendly and enemy units. */
 public class UnitBarsMod{
     private boolean enabled;
     private final Map<Unit,Float> shieldPeaks=new WeakHashMap<>();
@@ -42,7 +42,9 @@ public class UnitBarsMod{
         float left=Core.camera.position.x-Core.camera.width/2f;
         float bottom=Core.camera.position.y-Core.camera.height/2f;
         Groups.unit.intersect(left-40f*scale,bottom-40f*scale,Core.camera.width+80f*scale,Core.camera.height+80f*scale,unit->{
-            if(!BarPolicy.eligible(unit.isValid() && !unit.dead(),unit.team==Vars.player.team(),unit.inFogTo(Vars.player.team())))return;
+            boolean hidden=unit.inFogTo(Vars.player.team()) ||
+                (Vars.fogControl!=null && !Vars.fogControl.isVisible(Vars.player.team(),unit.x,unit.y));
+            if(!BarPolicy.eligible(unit.isValid() && !unit.dead(),hidden))return;
             float width=Math.max(24f*scale,Math.min(60f*scale,unit.hitSize));
             float height=3f*scale;
             float y=unit.y+unit.hitSize/2f+6f*scale;

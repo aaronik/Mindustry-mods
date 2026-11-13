@@ -103,6 +103,9 @@ public class EnemyInfoMod{
         if(py+panel.getHeight()>stageHeight)py=Core.input.mouseY()-panel.getHeight()-Scl.scl(18f);
         panel.setPosition(Mathf.clamp(px,0f,Math.max(0f,stageWidth-panel.getWidth())),
             Mathf.clamp(py,0f,Math.max(0f,stageHeight-panel.getHeight())));
+        // HUD controls are added after this panel; keep the visible tooltip on top.
+        // Touchable.disabled still lets clicks pass through to the controls below.
+        panel.toFront();
         panel.visible=true;
     }
 
