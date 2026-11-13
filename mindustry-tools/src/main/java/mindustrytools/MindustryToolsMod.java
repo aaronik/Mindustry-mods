@@ -52,7 +52,7 @@ public class MindustryToolsMod extends Mod{
             hudInstalled = true;
             Table main=new Table();
             main.right();
-            option(main,"500x",timeSpeed::enabled,timeSpeed::toggle);
+            option(main,"100x",timeSpeed::enabled,timeSpeed::toggle);
             main.row();
             option(main,"Auto-wave",autoWave::enabled,autoWave::toggle);
             main.row();

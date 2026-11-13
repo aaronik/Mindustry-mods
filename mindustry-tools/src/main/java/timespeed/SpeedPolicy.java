@@ -6,6 +6,6 @@ public final class SpeedPolicy{
         return inGame && !networkActive && !editor && !gameOver;
     }
     public static float simulationDelta(float delta){
-        return Float.isFinite(delta) && delta>0f && delta<=Float.MAX_VALUE/500f ? delta*500f : delta;
+        return Float.isFinite(delta) && delta>0f && delta<=Float.MAX_VALUE/100f ? delta*100f : delta;
     }
 }

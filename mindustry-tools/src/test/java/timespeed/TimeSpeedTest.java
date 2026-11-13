@@ -17,7 +17,7 @@ public class TimeSpeedTest{
         check(!SpeedPolicy.available(true,true,false,false),"multiplayer including host is blocked");
         check(!SpeedPolicy.available(true,false,true,false),"editor is blocked");
         check(!SpeedPolicy.available(true,false,false,true),"game over is blocked");
-        check(SpeedPolicy.simulationDelta(0.5f)==250f,"scales variable timestep");
+        check(SpeedPolicy.simulationDelta(0.5f)==50f,"scales variable timestep");
         check(SpeedPolicy.simulationDelta(0f)==0f,"zero delta remains zero");
         check(SpeedPolicy.simulationDelta(Float.MAX_VALUE)==Float.MAX_VALUE,"no overflow");
 
@@ -31,7 +31,7 @@ public class TimeSpeedTest{
         speed.toggle();
         check(speed.enabled(),"toggle enables speed");
         Events.fire(Trigger.beforeGameUpdate);
-        check(Time.delta==375f,"simulation runs at 500x delta");
+        check(Time.delta==75f,"simulation runs at 100x delta");
         Events.fire(Trigger.afterGameUpdate);
         check(Time.delta==0.75f,"normal UI delta restored");
         speed.toggle();
@@ -61,6 +61,6 @@ public class TimeSpeedTest{
         check(!speed.enabled(),"joining network disables speed");
         speed.toggle();
         check(!speed.enabled(),"cannot enable on network");
-        System.out.println("500x speed policy and lifecycle tests passed");
+        System.out.println("100x speed policy and lifecycle tests passed");
     }
 }
