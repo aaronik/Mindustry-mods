@@ -18,7 +18,12 @@ public final class Planner{
     public record Layout(List<Point> drills, List<Point> routers, int oreTiles, int coveredTiles, boolean truncated){}
 
     public static Layout plan(Grid grid, int startX, int startY, int size, int sizeOffset, int limit){
-        if(size < 1 || limit < 1 || !grid.inBounds(startX, startY) || !grid.ore(startX, startY)){
+        return plan(grid,startX,startY,size,sizeOffset,limit,size+1);
+    }
+
+    /** Custom lane period lets 1x1 pumps share a router lane on both sides. */
+    public static Layout plan(Grid grid, int startX, int startY, int size, int sizeOffset, int limit, int lanePeriod){
+        if(lanePeriod < 1 || size < 1 || limit < 1 || !grid.inBounds(startX, startY) || !grid.ore(startX, startY)){
             return new Layout(List.of(), List.of(), 0, 0, false);
         }
         Set<Point> patch = new HashSet<>();
@@ -68,7 +73,7 @@ public final class Planner{
         int minX = patch.stream().mapToInt(Point::x).min().orElse(startX);
         int minY = patch.stream().mapToInt(Point::y).min().orElse(startY);
         Layout best = new Layout(List.of(), List.of(), patch.size(), 0, truncated);
-        int period = size + 1;
+        int period = lanePeriod;
         long deadline = System.nanoTime() + 350_000_000L;
         for(int orientation = -1; orientation < 2; orientation++){
             for(int phase = 0; phase < (orientation < 0 ? 1 : period); phase++){

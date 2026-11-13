@@ -12,6 +12,11 @@ public class HoverPolicyTest{
         check(!HoverPolicy.hovered(101f,20f),"outside unit rejected");
         check(HoverPolicy.hovered(16f,2f),"small unit has minimum hover radius");
         check(!HoverPolicy.hovered(17f,2f),"minimum radius bounded");
-        System.out.println("Enemy hover visibility and hit tests passed");
+        check(HoverPolicy.showRange(240f),"positive turret range drawn");
+        check(!HoverPolicy.showRange(0f),"no zero-radius circle");
+        check(!HoverPolicy.showRange(-1f),"negative range excluded");
+        check(!HoverPolicy.showRange(Float.NaN),"NaN range excluded");
+        check(!HoverPolicy.showRange(Float.POSITIVE_INFINITY),"infinite range excluded");
+        System.out.println("Enemy hover visibility, hit and range tests passed");
     }
 }

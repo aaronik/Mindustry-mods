@@ -21,6 +21,7 @@ import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
 
 /** Passive, click-through HUD; never inspects enemies hidden by current fog. */
 public class EnemyInfoMod{
+    private BaseTurretBuild hoveredTurret;
     private Unit hoveredUnit;
     private float nearest;
     private Table panel;
@@ -41,6 +42,7 @@ public class EnemyInfoMod{
         panel.visible=false;
         // Invisible actors do not act(); keep hover checks running while hidden.
         Events.run(mindustry.game.EventType.Trigger.update,this::update);
+        Events.run(mindustry.game.EventType.Trigger.draw,this::drawRange);
         Vars.ui.hudGroup.addChild(panel);
     }
 
@@ -51,6 +53,7 @@ public class EnemyInfoMod{
     }
 
     private void update(){
+        hoveredTurret=null;
         panel.visible=false;
         if(Vars.state==null || !Vars.state.isGame() || Vars.state.isEditor() || Vars.player==null ||
             !Vars.ui.hudfrag.shown() || Core.scene.hasDialog() || Core.scene.hasMouse())return;
@@ -78,6 +81,7 @@ public class EnemyInfoMod{
             info="[accent]"+build.block.localizedName+"[] [lightgray]("+build.team.localized()+")[]\n"+
                 health(build.health,build.maxHealth)+"\nArmor: "+number(build.block.armor);
             if(build instanceof BaseTurretBuild turret){
+                hoveredTurret=turret;
                 info+="\nRange: "+number(turret.range()/Vars.tilesize)+" tiles";
             }
             if(build instanceof TurretBuild turret){
@@ -100,6 +104,22 @@ public class EnemyInfoMod{
         panel.setPosition(Mathf.clamp(px,0f,Math.max(0f,stageWidth-panel.getWidth())),
             Mathf.clamp(py,0f,Math.max(0f,stageHeight-panel.getHeight())));
         panel.visible=true;
+    }
+
+    private void drawRange(){
+        BaseTurretBuild turret=hoveredTurret;
+        if(turret==null || !panel.visible || Vars.state==null || !Vars.state.isGame() ||
+            Vars.state.isEditor() || Vars.player==null || !Vars.ui.hudfrag.shown() ||
+            Core.scene.hasDialog() || Core.scene.hasMouse() || !eligible(turret,turret.isValid()))return;
+        // Recheck the cursor at draw time so stale hover state cannot linger.
+        if(Vars.world.buildWorld(Core.input.mouseWorldX(),Core.input.mouseWorldY())!=turret)return;
+        float radius=turret.range();
+        if(!HoverPolicy.showRange(radius))return;
+        float previousZ=arc.graphics.g2d.Draw.z();
+        arc.graphics.g2d.Draw.z(mindustry.graphics.Layer.overlayUI);
+        mindustry.graphics.Drawf.dashCircle(turret.x,turret.y,radius,turret.team.color);
+        arc.graphics.g2d.Draw.reset();
+        arc.graphics.g2d.Draw.z(previousZ);
     }
 
     private static String health(float current,float max){

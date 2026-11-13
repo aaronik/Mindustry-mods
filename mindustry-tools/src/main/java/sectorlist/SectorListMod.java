@@ -94,15 +94,26 @@ public class SectorListMod{
         for(var row:selected){
             Sector sector=sectors.get(row.id());
             String marker=sector.isAttacked()?"[scarlet]Under attack[]":sector.isBeingPlayed()?"[accent]Current sector[]":"";
-            var best=row.exports().entrySet().stream().max(Map.Entry.comparingByValue()).orElse(null);
-            String top=best==null?"None":Vars.content.item(best.getKey()).localizedName+" ("+rate(best.getValue())+"/min)";
+            var exports=row.breakdown();
             String destination=sector.info.destination==null?"None":sector.info.destination.name()+" (#"+sector.info.destination.id+")";
             rows.button(button->{
                 button.left().margin(10f);
                 button.add(row.name()+" [lightgray](#"+row.id()+")[]").left().growX();
                 button.add(marker).right().row();
-                button.add("[accent]"+rate(row.rate(filter==null?null:(int)filter.id))+"/min[]"+(filter==null?" total exports":" "+filter.localizedName)).left().colspan(2).row();
-                button.add("Biggest: "+top+"   → "+destination).left().colspan(2).wrap().growX();
+                button.add("[accent]"+rate(row.rate(null))+"/min[] total exports"+
+                    (filter==null?"":"   • "+filter.localizedName+": "+rate(row.rate((int)filter.id))+"/min"))
+                    .left().colspan(2).row();
+                button.table(details->{
+                    details.left();
+                    if(exports.isEmpty())details.add("No recorded exports.").left();
+                    for(var entry:exports){
+                        Item item=Vars.content.item(entry.getKey());
+                        details.image(item.uiIcon).size(20f).padRight(6f);
+                        details.add(item.localizedName).left().padRight(16f);
+                        details.add(rate(entry.getValue())+"/min").right().row();
+                    }
+                }).left().colspan(2).padTop(5f).padBottom(5f).row();
+                button.add("Destination: "+destination).left().colspan(2).wrap().growX();
             },Styles.flatBordert,()->locate(sector)).growX().minHeight(100f).padBottom(5f).row();
         }
     }

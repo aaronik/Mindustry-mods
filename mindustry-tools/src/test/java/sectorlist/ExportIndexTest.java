@@ -13,6 +13,11 @@ public class ExportIndexTest{
         check(ExportIndex.perMinute(Float.NaN)==0d,"NaN sanitized");
         check(ExportIndex.perMinute(-2f)==0d,"negative sanitized");
         check(alpha.rate(null)==150d,"total sums exports");
+        check(alpha.breakdown().size()==2,"breakdown includes every exported item");
+        check(beta.breakdown().get(0).getKey()==2,"breakdown sorted highest rate first");
+        check(zero.breakdown().isEmpty(),"empty sector has no breakdown");
+        var invalid=new ExportIndex.Row(8,"Invalid",Map.of(1,-2d,2,Double.NaN,3,0d,4,5d));
+        check(invalid.breakdown().size()==1 && invalid.breakdown().get(0).getKey()==4,"exclude nonpositive and invalid rates");
         check(zero.rate(1)==0d,"missing item rate zero");
         check(ExportIndex.select(rows,"",null,false).get(0)==beta,"total exports descending");
         check(ExportIndex.select(rows,"",1,false).get(0)==alpha,"item filter changes ranking");

@@ -34,6 +34,24 @@ public class WaterPlannerTest{
         }
     }
     public static void main(String[] args){
+        Grid dense=new Grid();
+        for(int x=3;x<21;x++)for(int y=3;y<21;y++)dense.water.add(new Planner.Point(x,y));
+        var packed=WaterPlanner.plan(dense,10,10,1,0,1024);
+        verify(dense,packed);
+        check(packed.coveredTiles()>=216,"18x18 pond should fit at least two-thirds pumps: "+packed.coveredTiles());
+        var pumpTiles=new HashSet<>(packed.drills());
+        boolean pairedRows=false;
+        for(int y=3;y<20;y++){
+            boolean pair=true;
+            for(int x=4;x<20;x++)if(!pumpTiles.contains(new Planner.Point(x,y)) || !pumpTiles.contains(new Planner.Point(x,y+1)))pair=false;
+            if(pair)pairedRows=true;
+        }
+        if(!pairedRows)for(int x=3;x<20;x++){
+            boolean pair=true;
+            for(int y=4;y<20;y++)if(!pumpTiles.contains(new Planner.Point(x,y)) || !pumpTiles.contains(new Planner.Point(x+1,y)))pair=false;
+            if(pair)pairedRows=true;
+        }
+        check(pairedRows,"dense pond needs adjacent pump rows/columns between router lanes");
         Grid pond=new Grid();
         for(int x=3;x<19;x++)for(int y=3;y<17;y++)pond.water.add(new Planner.Point(x,y));
         pond.obstacles.add(new Planner.Point(7,7));

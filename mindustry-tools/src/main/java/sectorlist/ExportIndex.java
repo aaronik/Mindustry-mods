@@ -6,6 +6,10 @@ import java.util.*;
 public final class ExportIndex{
     private ExportIndex(){}
     public record Row(int id,String name,Map<Integer,Double> exports){
+        public List<Map.Entry<Integer,Double>> breakdown(){
+            return exports.entrySet().stream().filter(e->clean(e.getValue())>0d)
+                .sorted(Map.Entry.<Integer,Double>comparingByValue().reversed().thenComparingInt(Map.Entry::getKey)).toList();
+        }
         public double rate(Integer item){
             if(item!=null)return clean(exports.getOrDefault(item,0d));
             return exports.values().stream().mapToDouble(ExportIndex::clean).sum();
