@@ -10,7 +10,7 @@ Download `mindustry-tools.jar` from the [latest release](https://github.com/Aaro
 ~/Library/Application Support/Steam/steamapps/common/Mindustry/Mindustry.app/Contents/Resources/saves/mods/
 ```
 
-If building locally on that machine, `./install.sh` compiles, verifies the JAR, moves standalone JARs into `mods/legacy-mindustry-mods-backup/`, and installs the combined JAR atomically. Set `MINDUSTRY_JAR=/path/to/desktop.jar` or `MINDUSTRY_MODS=/path/to/mods` if needed. Do not update JARs while Mindustry is running; fully restart it afterward.
+If building locally on that machine, `./install.sh` compiles, verifies the JAR, moves standalone JARs into `mods/legacy-mindustry-mods-backup/`, and installs the combined JAR atomically. Set `MINDUSTRY_JAR=/path/to/desktop.jar` or `MINDUSTRY_MODS=/path/to/mods` if needed. The local workflow installs even while Mindustry is running, using atomic replacement rather than writing in place. Fully restart afterward to load changes; this is not hot reload. If the current session encounters class-loading errors, restart it.
 
 ## Use
 

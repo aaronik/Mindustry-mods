@@ -26,7 +26,7 @@ One mod for **Mindustry Steam 160.7** with a compact **Pack** submenu. It combin
    ~/Library/Application Support/Steam/steamapps/common/Mindustry/Mindustry.app/Contents/Resources/saves/mods/
    ```
 
-4. **Fully quit and restart Mindustry.** Don't overwrite mod JARs while the game is running; delayed Java class loading may fail.
+4. **Fully quit and restart Mindustry after installation** to load the update. The local `install.sh` workflow can atomically replace the JAR while the game is running; this is not hot reload. Avoid in-place writes to a loaded JAR. If the running session encounters class-loading errors, fully restart.
 
 If building/installing locally on the above Steam macOS installation, `cd mindustry-tools && ./install.sh` builds and verifies the combined JAR, moves the five old JARs to `mods/legacy-mindustry-mods-backup/`, and installs the new JAR atomically.
 
