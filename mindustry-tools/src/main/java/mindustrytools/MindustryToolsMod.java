@@ -59,7 +59,7 @@ public class MindustryToolsMod extends Mod{
             Table speeds=new Table();
             speeds.margin(0f);
             int[] presets={2,5,100};
-            float[] widths={58f,58f,59f};
+            float[] widths={45f,45f,85f};
             for(int i=0;i<presets.length;i++){
                 final int speed=presets[i];
                 TextButton button=speeds.button(Integer.toString(speed),Styles.togglet,()->timeSpeed.select(speed))
