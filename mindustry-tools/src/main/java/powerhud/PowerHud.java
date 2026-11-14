@@ -65,29 +65,20 @@ public class PowerHud{
     }
     private void refresh(){
         Map<Integer,PowerSnapshot.Network> networks=new HashMap<>();
-        Map<Integer,String> locations=new HashMap<>();
         for(var building:Vars.player.team().data().buildings){
             if(!building.isValid() || building.team!=Vars.player.team() || building.power==null || building.power.graph==null)continue;
             var graph=building.power.graph;
             if(networks.containsKey(graph.getID()) ||
                 !PowerSnapshot.meaningful(graph.producers.size,graph.consumers.size,graph.batteries.size))continue;
-            var representative=graph.consumers.size>0?graph.consumers.first():
-                graph.producers.size>0?graph.producers.first():graph.batteries.first();
-            locations.put(graph.getID(),representative.block.localizedName+" @ "+representative.tileX()+", "+representative.tileY());
             networks.put(graph.getID(),new PowerSnapshot.Network(graph.getID(),graph.all.size,
                 graph.getLastScaledPowerIn(),graph.getLastScaledPowerOut(),graph.getLastPowerStored(),graph.getLastCapacity()));
         }
         var snapshot=PowerSnapshot.unique(networks.values());
         lines.clearChildren();
-        lines.add("[accent]Power[] — "+snapshot.size()+" networks").left().row();
-        int index=0;
         for(var network:snapshot){
             String sign=network.balance()>=0d?"[green]+":"[scarlet]";
-            lines.add("Network "+(++index)+" — "+network.buildings()+" buildings").left().row();
-            lines.add("Gen "+amount(network.generation())+"/s  Demand "+amount(network.demand())+
-                "/s  Net "+sign+amount(network.balance())+"[]/s").left().row();
-            lines.add("Battery "+amount(network.charge())+" / "+amount(network.batteryCapacity())+
-                "  [lightgray]"+locations.get(network.id())+"[]").left().row();
+            lines.add("Net "+sign+amount(network.balance())+"[]/s   Battery "+
+                amount(network.charge())+" / "+amount(network.batteryCapacity())).left().row();
         }
         if(snapshot.isEmpty())lines.add("No power networks.").left().row();
         panel.getCell(scroll).width(Math.min(430f,Math.max(150f,Core.scene.getWidth()/Scl.scl(1f)-24f)))
