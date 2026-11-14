@@ -12,6 +12,9 @@ public final class PowerSnapshot{
         public double charge(){return positive(stored);}
         public double batteryCapacity(){return positive(capacity);}
     }
+    public static boolean meaningful(int producers,int consumers,int batteries){
+        return producers>0 || consumers>0 || batteries>0;
+    }
     private static double positive(float value){return Float.isFinite(value) && value>0f?value:0d;}
     public static List<Network> unique(Collection<Network> networks){
         Map<Integer,Network> unique=new HashMap<>();

@@ -15,6 +15,10 @@ public class PowerSnapshotTest{
         check(large.charge()==500d && large.batteryCapacity()==1000d,"battery energy not multiplied by time");
         var invalid=new PowerSnapshot.Network(1,1,Float.NaN,-1f,-2f,Float.POSITIVE_INFINITY);
         check(invalid.generation()==0d && invalid.demand()==0d && invalid.charge()==0d && invalid.batteryCapacity()==0d,"invalid metrics safe");
+        check(!PowerSnapshot.meaningful(0,0,0),"node-only and inert graphs omitted");
+        check(PowerSnapshot.meaningful(0,1,0),"idle disconnected consumer retained even at zero demand");
+        check(PowerSnapshot.meaningful(1,0,0),"standalone generator retained");
+        check(PowerSnapshot.meaningful(0,0,1),"standalone battery retained");
         System.out.println("Power network snapshot tests passed");
     }
 }
