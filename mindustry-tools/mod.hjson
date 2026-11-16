@@ -3,6 +3,6 @@ displayName: Mindustry Tools
 author: Aaron
 main: mindustrytools.MindustryToolsMod
 description: Sector export browser, enemy hover info, 2/5/100 speed presets, Auto-wave, export redirect and construction tools.
-version: 1.20.0
+version: 1.20.1
 minGameVersion: 160.7
 hidden: true

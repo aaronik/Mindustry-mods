@@ -80,16 +80,15 @@ public class PowerHud{
         var snapshot=PowerSnapshot.unique(networks.values());
         var ids=snapshot.stream().map(PowerSnapshot.Network::id).toList();
         if(!ids.contains(selectedGraph))selectedGraph=-1;
-        // Preserve actors across metric refreshes so a click is not lost mid-press.
+        // Preserve actors across metric refreshes to keep hover feedback stable.
         if(!ids.equals(rowIds) || rowButtons.size()!=ids.size()){
             rowIds=ids;rowButtons.clear();lines.clearChildren();
             for(int id:ids){
-                var button=lines.button("",Styles.clearTogglet,()->selectedGraph=PowerSnapshot.toggleSelection(selectedGraph,id))
+                var button=lines.button("",Styles.cleart,()->{})
                     .growX().pad(0f).get();
                 button.margin(0f);
                 button.getLabel().setAlignment(arc.util.Align.left);
                 button.setProgrammaticChangeEvents(false);
-                button.update(()->button.setChecked(selectedGraph==id));
                 rowButtons.put(id,button);
                 lines.row();
             }
@@ -104,6 +103,11 @@ public class PowerHud{
             .height(Math.min(230f,Math.max(30f,lines.getPrefHeight())));
     }
     private void drawHighlight(){
+        selectedGraph=-1;
+        var hovered=Core.scene.getHoverElement();
+        if(hovered!=null)for(var entry:rowButtons.entrySet()){
+            if(hovered.isDescendantOf(entry.getValue())){selectedGraph=entry.getKey();break;}
+        }
         if(selectedGraph<0 || panel==null || !panel.visible || Vars.state==null || !Vars.state.isGame() ||
             Vars.player==null || !Vars.ui.hudfrag.shown() || Core.scene.hasDialog() ||
             Vars.player.team().data().buildingTree==null)return;

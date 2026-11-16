@@ -19,9 +19,6 @@ public class PowerSnapshotTest{
         check(PowerSnapshot.meaningful(0,1,0),"idle disconnected consumer retained even at zero demand");
         check(PowerSnapshot.meaningful(1,0,0),"standalone generator retained");
         check(PowerSnapshot.meaningful(0,0,1),"standalone battery retained");
-        check(PowerSnapshot.toggleSelection(-1,7)==7,"click selects network");
-        check(PowerSnapshot.toggleSelection(7,7)==-1,"second click clears selection");
-        check(PowerSnapshot.toggleSelection(7,9)==9,"another line switches selection");
         System.out.println("Power network snapshot tests passed");
     }
 }
