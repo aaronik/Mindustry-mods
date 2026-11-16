@@ -22,13 +22,16 @@ public class PowerHud{
     private ScrollPane scroll;
     private long nextRefresh;
     private final Vec2 anchor=new Vec2();
+    private int selectedGraph=-1;
+    private List<Integer> rowIds;
+    private final Map<Integer,arc.scene.ui.TextButton> rowButtons=new HashMap<>();
 
     public PowerHud(){
         Events.on(ClientLoadEvent.class,event->install());
         Events.on(WorldLoadEvent.class,event->reset());
         Events.on(ResetEvent.class,event->reset());
     }
-    private void reset(){nextRefresh=0L;if(panel!=null)panel.visible=false;}
+    private void reset(){nextRefresh=0L;selectedGraph=-1;if(panel!=null)panel.visible=false;}
     private void install(){
         if(panel!=null || Vars.headless)return;
         panel=new Table(Styles.black6);
@@ -41,6 +44,7 @@ public class PowerHud{
         panel.visible=false;
         Vars.ui.hudGroup.addChild(panel);
         Events.run(Trigger.update,this::update);
+        Events.run(Trigger.draw,this::drawHighlight);
     }
     private void update(){
         panel.visible=false;
@@ -74,16 +78,49 @@ public class PowerHud{
                 graph.getLastScaledPowerIn(),graph.getLastScaledPowerOut(),graph.getLastPowerStored(),graph.getLastCapacity()));
         }
         var snapshot=PowerSnapshot.unique(networks.values());
-        lines.clearChildren();
+        var ids=snapshot.stream().map(PowerSnapshot.Network::id).toList();
+        if(!ids.contains(selectedGraph))selectedGraph=-1;
+        // Preserve actors across metric refreshes so a click is not lost mid-press.
+        if(!ids.equals(rowIds) || rowButtons.size()!=ids.size()){
+            rowIds=ids;rowButtons.clear();lines.clearChildren();
+            for(int id:ids){
+                var button=lines.button("",Styles.clearTogglet,()->selectedGraph=PowerSnapshot.toggleSelection(selectedGraph,id))
+                    .growX().pad(0f).get();
+                button.margin(0f);
+                button.getLabel().setAlignment(arc.util.Align.left);
+                button.setProgrammaticChangeEvents(false);
+                button.update(()->button.setChecked(selectedGraph==id));
+                rowButtons.put(id,button);
+                lines.row();
+            }
+            if(snapshot.isEmpty())lines.add("No power networks.").left().row();
+        }
         for(var network:snapshot){
             String sign=network.balance()>=0d?"[green]+":"[scarlet]";
-            lines.add("Net "+sign+amount(network.balance())+"[]/s   Battery "+
-                amount(network.charge())+" / "+amount(network.batteryCapacity())).left().row();
+            rowButtons.get(network.id()).setText("Net "+sign+amount(network.balance())+"[]/s   Battery "+
+                amount(network.charge())+" / "+amount(network.batteryCapacity()));
         }
-        if(snapshot.isEmpty())lines.add("No power networks.").left().row();
         panel.getCell(scroll).width(Math.min(430f,Math.max(150f,Core.scene.getWidth()/Scl.scl(1f)-24f)))
             .height(Math.min(230f,Math.max(30f,lines.getPrefHeight())));
     }
+    private void drawHighlight(){
+        if(selectedGraph<0 || panel==null || !panel.visible || Vars.state==null || !Vars.state.isGame() ||
+            Vars.player==null || !Vars.ui.hudfrag.shown() || Core.scene.hasDialog() ||
+            Vars.player.team().data().buildingTree==null)return;
+        float previousZ=arc.graphics.g2d.Draw.z();
+        arc.graphics.g2d.Draw.z(mindustry.graphics.Layer.overlayUI);
+        float left=Core.camera.position.x-Core.camera.width/2f;
+        float bottom=Core.camera.position.y-Core.camera.height/2f;
+        Vars.player.team().data().buildingTree.intersect(left,bottom,Core.camera.width,Core.camera.height,building->{
+            if(!building.isValid() || building.team!=Vars.player.team() || building.power==null ||
+                building.power.graph==null || building.power.graph.getID()!=selectedGraph ||
+                building.inFogTo(Vars.player.team()))return;
+            mindustry.graphics.Drawf.selected(building,mindustry.graphics.Pal.accent);
+        });
+        arc.graphics.g2d.Draw.reset();
+        arc.graphics.g2d.Draw.z(previousZ);
+    }
+
     private static String amount(double value){
         double magnitude=Math.abs(value);
         return magnitude>=1_000_000d?Strings.autoFixed((float)(value/1_000_000d),1)+"m":

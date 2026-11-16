@@ -12,6 +12,7 @@ public final class PowerSnapshot{
         public double charge(){return positive(stored);}
         public double batteryCapacity(){return positive(capacity);}
     }
+    public static int toggleSelection(int current,int clicked){return current==clicked?-1:clicked;}
     public static boolean meaningful(int producers,int consumers,int batteries){
         return producers>0 || consumers>0 || batteries>0;
     }
