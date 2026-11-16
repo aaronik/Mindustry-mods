@@ -40,18 +40,33 @@ public class PowerHud{
         scroll=new ScrollPane(lines);
         scroll.setScrollingDisabled(true,false);
         scroll.setOverscroll(false,false);
+        scroll.addListener(new arc.scene.event.InputListener(){
+            @Override public void exit(arc.scene.event.InputEvent event,float x,float y,int pointer,arc.scene.Element toActor){
+                releaseScrollFocus(toActor,panel.visible);
+            }
+        });
         panel.add(scroll).width(430f).height(30f);
         panel.visible=false;
         Vars.ui.hudGroup.addChild(panel);
         Events.run(Trigger.update,this::update);
         Events.run(Trigger.draw,this::drawHighlight);
     }
+    private void releaseScrollFocus(arc.scene.Element hovered,boolean visible){
+        if(Core.scene!=null && ScrollFocusPolicy.release(panel,Core.scene.getScrollFocus(),hovered,visible))
+            Core.scene.setScrollFocus(null);
+    }
     private void update(){
+        // Handle exit even when the panel becomes hidden or is moved/rebuilt.
+        releaseScrollFocus(Core.scene.getHoverElement(),panel.visible);
         panel.visible=false;
         if(Vars.state==null || !Vars.state.isGame() || Vars.state.isEditor() || Vars.player==null ||
-            !Vars.ui.hudfrag.shown() || !Core.settings.getBool("coreitems") || Core.scene.hasDialog())return;
+            !Vars.ui.hudfrag.shown() || !Core.settings.getBool("coreitems") || Core.scene.hasDialog()){
+            releaseScrollFocus(null,false);return;
+        }
         var resources=Vars.ui.hudfrag.coreItems;
-        if(resources.parent==null || resources.getWidth()<=0f || resources.getHeight()<=0f)return;
+        if(resources.parent==null || resources.getWidth()<=0f || resources.getHeight()<=0f){
+            releaseScrollFocus(null,false);return;
+        }
         long now=System.nanoTime();
         if(now>=nextRefresh){refresh();nextRefresh=now+500_000_000L;}
         panel.pack();
