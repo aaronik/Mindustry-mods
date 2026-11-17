@@ -130,11 +130,25 @@ public class PowerHud{
         arc.graphics.g2d.Draw.z(mindustry.graphics.Layer.overlayUI);
         float left=Core.camera.position.x-Core.camera.width/2f;
         float bottom=Core.camera.position.y-Core.camera.height/2f;
+        float pixel=Core.camera.width/Math.max(1,Core.graphics.getWidth());
+        // Real time keeps the gentle pulse readable even with 100x simulation speed.
+        float pulse=(float)(0.5d+0.5d*Math.sin((System.nanoTime()%10_000_000_000L)/1_000_000_000d*Math.PI));
         Vars.player.team().data().buildingTree.intersect(left,bottom,Core.camera.width,Core.camera.height,building->{
             if(!building.isValid() || building.team!=Vars.player.team() || building.power==null ||
                 building.power.graph==null || building.power.graph.getID()!=selectedGraph ||
                 building.inFogTo(Vars.player.team()))return;
-            mindustry.graphics.Drawf.selected(building,mindustry.graphics.Pal.accent);
+            float radius=Math.max(building.block.size*Vars.tilesize/2f+pixel,7f*pixel);
+            arc.graphics.g2d.Draw.color(arc.graphics.Color.yellow,0.35f+0.2f*pulse);
+            arc.graphics.g2d.Fill.square(building.x,building.y,radius);
+            arc.graphics.g2d.Draw.color(arc.graphics.Color.black);
+            arc.graphics.g2d.Lines.stroke(7f*pixel);
+            arc.graphics.g2d.Lines.square(building.x,building.y,radius);
+            arc.graphics.g2d.Draw.color(arc.graphics.Color.yellow);
+            arc.graphics.g2d.Lines.stroke(4f*pixel);
+            arc.graphics.g2d.Lines.square(building.x,building.y,radius);
+            arc.graphics.g2d.Draw.color(arc.graphics.Color.white);
+            arc.graphics.g2d.Lines.stroke(1.5f*pixel);
+            arc.graphics.g2d.Lines.square(building.x,building.y,radius);
         });
         arc.graphics.g2d.Draw.reset();
         arc.graphics.g2d.Draw.z(previousZ);
