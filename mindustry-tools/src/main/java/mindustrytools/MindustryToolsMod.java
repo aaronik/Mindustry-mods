@@ -32,6 +32,7 @@ public class MindustryToolsMod extends Mod{
     private final unitbars.UnitBarsMod unitBars = new unitbars.UnitBarsMod();
     private final powerhud.PowerHud powerHud = new powerhud.PowerHud();
     private final sectorpreview.SectorPreviewMod sectorPreview = new sectorpreview.SectorPreviewMod();
+    private final relanding.RelandingMod relanding = new relanding.RelandingMod();
     private final AutoDrillMod drill = new AutoDrillMod();
     private final SurgeRouteMod surge = new SurgeRouteMod();
     private final SolarPackMod solar = new SolarPackMod();
