@@ -1,7 +1,7 @@
 package mindustrytools;
 
 import arc.Events;
-import arc.scene.event.Touchable;
+import arc.scene.style.TextureRegionDrawable;
 import arc.scene.Element;
 import arc.scene.ui.layout.Scl;
 import arc.math.geom.Vec2;
@@ -15,11 +15,13 @@ import minepack.MinePackMod;
 import propcleanup.PropCleanupMod;
 import padredirect.PadRedirectMod;
 import mindustry.Vars;
+import mindustry.content.Blocks;
 import mindustry.game.EventType.ClientLoadEvent;
 import mindustry.game.EventType.WorldLoadEvent;
 import mindustry.game.EventType.ResetEvent;
 import mindustry.mod.Mod;
 import mindustry.ui.Styles;
+import mindustry.world.Block;
 import solarpack.SolarPackMod;
 import surgeroute.SurgeRouteMod;
 import timespeed.TimeSpeedMod;
@@ -93,12 +95,12 @@ public class MindustryToolsMod extends Mod{
 
             Table packs=new Table();
             packs.right();
-            option(packs,"Wall",wall::armed,()->select(Tool.wall));
-            option(packs,"Battery",battery::armed,()->select(Tool.battery));
-            option(packs,"Solar",solar::armed,()->select(Tool.solar));
-            option(packs,"Mine",mine::armed,()->select(Tool.mine));
-            option(packs,"Water",water::armed,()->select(Tool.water));
-            option(packs,"Drill",drill::armed,()->select(Tool.drill));
+            packOption(packs,"Battery",Blocks.batteryLarge,battery::armed,Tool.battery);
+            packOption(packs,"Drill",Blocks.pneumaticDrill,drill::armed,Tool.drill);
+            packOption(packs,"Mine",Blocks.shockMine,mine::armed,Tool.mine);
+            packOption(packs,"Solar",Blocks.largeSolarPanel,solar::armed,Tool.solar);
+            packOption(packs,"Wall",Blocks.copperWallLarge,wall::armed,Tool.wall);
+            packOption(packs,"Water",Blocks.mechanicalPump,water::armed,Tool.water);
             packs.pack();
             packs.visible(() -> hudVisible() && packOpen);
             packs.update(() -> packs.setPosition(panelLeft()-Scl.scl(gap*2f+packGutter)-main.getWidth()-packs.getWidth(),Scl.scl(6f)));
@@ -134,6 +136,13 @@ public class MindustryToolsMod extends Mod{
         button.setProgrammaticChangeEvents(false);
         button.clicked(action);
         button.update(() -> button.setChecked(checked.get()));
+    }
+    private void packOption(Table table, String label, Block block, arc.func.Boolp checked, Tool tool){
+        TextButton button=table.button(label,new TextureRegionDrawable(block.uiIcon),Styles.togglet,24f,()->select(tool))
+            .size(175f,45f).get();
+        button.getLabelCell().padLeft(6f);
+        button.setProgrammaticChangeEvents(false);
+        button.update(()->button.setChecked(checked.get()));
     }
     private enum Tool{drill,surge,solar,battery,wall,mine,water}
     private void select(Tool tool){
